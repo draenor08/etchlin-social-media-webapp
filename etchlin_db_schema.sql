@@ -96,8 +96,6 @@ CREATE INDEX idx_user_email ON user(email);
 CREATE INDEX idx_post_timestamp ON post(timestamp);
 CREATE INDEX idx_comment_timestamp ON comment(timestamp);
 
-USE etchlin_db;
-
 -- Add status column with ENUM
 ALTER TABLE friends 
 ADD COLUMN status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending';
@@ -114,8 +112,6 @@ ADD CONSTRAINT chk_friends_order CHECK (request < acceptance);
 CREATE INDEX idx_request ON friends(request);
 CREATE INDEX idx_acceptance ON friends(acceptance);
 
-USE etchlin_db;
-
 ALTER TABLE post 
 ADD CONSTRAINT chk_post_content CHECK (caption IS NOT NULL OR image_url IS NOT NULL);
 
@@ -127,3 +123,6 @@ ADD COLUMN flag_reason VARCHAR(500);
 
 CREATE INDEX idx_user_name ON user(first_name, last_name);
 CREATE INDEX idx_flagged_posts ON post(is_flagged);
+
+ALTER TABLE user
+ADD COLUMN profile_picture VARCHAR(255) DEFAULT NULL;
