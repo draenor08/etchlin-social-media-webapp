@@ -20,3 +20,18 @@ backend/static/
 # Logs
 *.log
 
+# Docker-related files (if applicable)
+**/docker-compose.yml
+**/Dockerfile
+
+# Python compiled files
+*.pyc
+*.pyo
+
+# Coverage and test results
+.coverage
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+
