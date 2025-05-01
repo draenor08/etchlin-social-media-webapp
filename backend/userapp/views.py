@@ -1,58 +1,74 @@
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+# File: userapp/views.py
+import hashlib
+import uuid
+import mysql.connector
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.contrib.sessions.backends.db import SessionStore
 import json
-from db.mysql_connection import get_connection
+
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': settings.DATABASES['default']['USER'],
+    'password': settings.DATABASES['default']['PASSWORD'],
+    'database': settings.DATABASES['default']['NAME'],
+}
+
+def get_db_connection():
+    return mysql.connector.connect(**DB_CONFIG)
+
+def hash_password(password):
+    salt = uuid.uuid4().hex
+    hashed = hashlib.sha256((password + salt).encode()).hexdigest()
+    return f"{hashed}${salt}"
+
+def check_password(password, hashed_with_salt):
+    hashed, salt = hashed_with_salt.split("$")
+    return hashed == hashlib.sha256((password + salt).encode()).hexdigest()
 
 @csrf_exempt
-def signup(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')  # You should hash this
-        email = data.get('email')
-        
-        conn = get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("INSERT INTO user (username, password, email) VALUES (%s, %s, %s)", (username, password, email))
-            conn.commit()
-            return JsonResponse({'message': 'Signup successful'}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-        finally:
-            cursor.close()
-            conn.close()
+def register(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    username = data.get('username')
+    password = data.get('password')
 
-@csrf_exempt
-def login(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
+    if not username or not password:
+        return JsonResponse({'error': 'Missing username or password'}, status=400)
 
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM user WHERE username = %s AND password = %s", (username, password))
-        user = cursor.fetchone()
+    hashed_password = hash_password(password)
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+        conn.commit()
+        return JsonResponse({'message': 'User registered successfully'})
+    except mysql.connector.Error as err:
+        return JsonResponse({'error': str(err)}, status=500)
+    finally:
         cursor.close()
         conn.close()
 
-        if user:
-            request.session['user_id'] = user['user_id']
-            return JsonResponse({'message': 'Login successful'})
-        return JsonResponse({'error': 'Invalid credentials'}, status=401)
+@csrf_exempt
+def login(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
-def get_profile(request):
-    user_id = request.session.get('user_id')
-    if not user_id:
-        return JsonResponse({'error': 'Not logged in'}, status=401)
+    data = json.loads(request.body)
+    username = data.get('username')
+    password = data.get('password')
 
-    conn = get_connection()
+    conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT username, email FROM user WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT id, password FROM users WHERE username=%s", (username,))
     user = cursor.fetchone()
-    cursor.close()
-    conn.close()
 
-    return JsonResponse(user if user else {}, status=200)
+    if user and check_password(password, user['password']):
+        request.session['user_id'] = user['id']
+        return JsonResponse({'message': 'Login successful'})
+    else:
+        return JsonResponse({'error': 'Invalid credentials'}, status=401)

@@ -1,48 +1,52 @@
-# postapp/views.py
 import os
-import mysql.connector
+import uuid
+import pymysql
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
-from django.contrib import messages  # for showing error/success messages
+from django.utils import timezone
 
+@csrf_exempt
 def create_post(request):
-    if request.method == 'POST' and request.FILES.get('image'):
-        image = request.FILES['image']
-        text = request.POST.get('text', '')
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        caption = request.POST.get('caption', '')
+        image = request.FILES.get('image')
 
-        # Save image to the filesystem
+        if not user_id or not image:
+            return JsonResponse({'error': 'user_id and image are required'}, status=400)
+
+        post_id = str(uuid.uuid4().hex[:16])
+        image_name = f"{post_id}_{image.name}"
+        image_path = os.path.join(settings.MEDIA_ROOT, 'posts', image_name)
+
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
         fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'posts'))
-        filename = fs.save(image.name, image)
-        image_path = os.path.join('posts', filename)  # Save relative path to DB
+        fs.save(image_name, image)
+
+        image_url = f"/media/posts/{image_name}"
+        timestamp = timezone.now()
 
         try:
-            # Connect to MySQL
-            conn = mysql.connector.connect(
+            conn = pymysql.connect(
                 host='localhost',
-                user='root',
-                password='1234@Bcd',
-                database='etchlin_db'
+                user=os.getenv("MYSQL_USER"),
+                password=os.getenv("MYSQL_PASSWORD"),
+                database=os.getenv("MYSQL_DB")
             )
             cursor = conn.cursor()
-            user_id = request.user.id  # assuming the user is logged in
-
-            # Insert the post into the database
-            query = "INSERT INTO post (user_id, image, text, created_at) VALUES (%s, %s, %s, NOW())"
-            cursor.execute(query, (user_id, image_path, text))
+            sql = """
+                INSERT INTO post (post_id, user_id, caption, image_url, timestamp)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (post_id, user_id, caption, image_url, timestamp))
             conn.commit()
-
-            # Close the connection
             cursor.close()
             conn.close()
+            return JsonResponse({'message': 'Post created successfully', 'post_id': post_id}, status=201)
 
-            # Success message
-            messages.success(request, "Post created successfully!")
-            return redirect('some_success_page')  # Redirect to the appropriate page
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
-        except mysql.connector.Error as err:
-            # Handle database errors
-            messages.error(request, f"Error: {err}")
-            return redirect('error_page')  # Redirect to an error page or home
-
-    return render(request, 'post_form.html')
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
