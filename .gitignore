@@ -1,0 +1,22 @@
+# Node modules (Frontend)
+frontend/node_modules/
+
+# Build output for React
+frontend/build/
+
+# Environment variables
+*backend/.env
+
+# Django / Backend
+venv/       # Virtual environment for backend
+backend/__pycache__/ # Python bytecode cache
+backend/static/
+
+# IDE & OS files
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+*.log
+
