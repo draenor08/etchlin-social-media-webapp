@@ -1,4 +1,4 @@
-import "./sidebar.css";
+import "../styles/componentStyles/sidebar.css";
 import {
   RssFeed,
   Chat,
@@ -8,8 +8,8 @@ import {
   HelpOutline,
   WorkOutline,
   Event,
-  School,
-} from "@material-ui/icons";
+  School
+} from '@mui/icons-material';
 import { Users } from "../dummyData";
 import CloseFriend from "./CloseFriend";
 

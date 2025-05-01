@@ -1,6 +1,6 @@
 import Post from "./Post";
 import Share from "./Share";
-import "./feed.css";
+import "../styles/componentStyles/feed.css";
 import { Posts } from "../dummyData";
 
 export default function Feed() {

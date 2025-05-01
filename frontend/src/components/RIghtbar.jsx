@@ -1,4 +1,4 @@
-import "./rightbar.css";
+import "../styles/componentStyles/rightbar.css";
 import { Users } from "../dummyData";
 import Online from "./Online";
 

@@ -1,4 +1,4 @@
-import "./register.css";
+import "../styles/pageStyles/register.css";
 
 export default function Register() {
   return (

@@ -2,7 +2,7 @@ import Topbar from "../components/Topbar";
 import Sidebar from "../components/Sidebar";
 import Feed from "../components/Feed";
 import Rightbar from "../components/RIghtbar";
-import "./home.css"
+import "../styles/pageStyles/home.css"
 
 export default function Home() {
   return (

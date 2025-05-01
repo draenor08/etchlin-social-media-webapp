@@ -1,4 +1,4 @@
-import "./profile.css";
+import "../styles/pageStyles/profile.css";
 import Topbar from "../components/Topbar";
 import Sidebar from "../components/Sidebar";
 import Feed from "../components/Feed";

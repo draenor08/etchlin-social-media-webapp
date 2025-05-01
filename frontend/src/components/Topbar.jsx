@@ -1,11 +1,12 @@
-import "./topbar.css";
-import { Search, Person, Chat, Notifications } from "@material-ui/icons";
+import "../styles/componentStyles/topbar.css";
+import Chat from '@mui/icons-material/Chat';
+import { Search, Person, Chat as ChatIcon, Notifications } from '@mui/icons-material';
 
 export default function Topbar() {
   return (
     <div className="topbarContainer">
       <div className="topbarLeft">
-        <span className="logo">Lamasocial</span>
+        <span className="logo">Etchlin</span>
       </div>
       <div className="topbarCenter">
         <div className="searchbar">

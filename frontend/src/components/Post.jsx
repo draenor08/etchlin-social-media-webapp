@@ -1,5 +1,5 @@
-import "./post.css";
-import { MoreVert } from "@material-ui/icons";
+import "../styles/componentStyles/post.css";
+import MoreVert from '@mui/icons-material/MoreVert';
 import { Users } from "../dummyData";
 import { useState } from "react";
 
