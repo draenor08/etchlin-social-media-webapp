@@ -1,16 +1,13 @@
-# File: userapp/views.py
-from datetime import timezone
 import hashlib
 import uuid
-from django.db import connection
-import mysql.connector
+import json
+import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from django.contrib.sessions.backends.db import SessionStore
-import json
-import os
+import mysql.connector
 
+# --- DB CONFIG ---
 DB_CONFIG = {
     'host': 'localhost',
     'user': settings.DATABASES['default']['USER'],
@@ -21,6 +18,7 @@ DB_CONFIG = {
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
+# --- PASSWORD UTILS ---
 def hash_password(password):
     salt = uuid.uuid4().hex
     hashed = hashlib.sha256((password + salt).encode()).hexdigest()
@@ -30,63 +28,95 @@ def check_password(password, hashed_with_salt):
     hashed, salt = hashed_with_salt.split("$")
     return hashed == hashlib.sha256((password + salt).encode()).hexdigest()
 
+# --- REGISTER ---
 @csrf_exempt
-def register(request):
+def register_user(request):
     if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST allowed'}, status=405)
-    
-    data = json.loads(request.body)
-    username = data.get('username')
-    password = data.get('password')
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
 
-    if not username or not password:
-        return JsonResponse({'error': 'Missing username or password'}, status=400)
-
-    hashed_password = hash_password(password)
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
     try:
-        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
-        conn.commit()
-        return JsonResponse({'message': 'User registered successfully'})
-    except mysql.connector.Error as err:
-        return JsonResponse({'error': str(err)}, status=500)
-    finally:
-        cursor.close()
-        conn.close()
+        data = json.loads(request.body)
+        email = data.get('email')
+        password = data.get('password')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        date_of_birth = data.get('date_of_birth')
+        bio = data.get('bio', '')
 
+        if not all([email, password, first_name, last_name, date_of_birth]):
+            return JsonResponse({'error': 'Missing required fields'}, status=400)
+
+        hashed_password = hash_password(password)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT user_id FROM user WHERE email = %s", (email,))
+        if cursor.fetchone():
+            return JsonResponse({'error': 'Email already exists'}, status=409)
+
+        cursor.execute("""
+            INSERT INTO user (email, password, first_name, last_name, date_of_birth, bio)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (email, hashed_password, first_name, last_name, date_of_birth, bio))
+
+        conn.commit()
+        return JsonResponse({'message': 'User registered successfully'}, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# --- LOGIN ---
 @csrf_exempt
 def login(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
-    data = json.loads(request.body)
-    username = data.get('username')
-    password = data.get('password')
+    try:
+        data = json.loads(request.body)
+        email = data.get('email')
+        password = data.get('password')
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT id, password FROM users WHERE username=%s", (username,))
-    user = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT user_id, password FROM user WHERE email=%s", (email,))
+        user = cursor.fetchone()
 
-    if user and check_password(password, user['password']):
-        request.session['user_id'] = user['id']
-        return JsonResponse({'message': 'Login successful'})
-    else:
-        return JsonResponse({'error': 'Invalid credentials'}, status=401)
-    
+        if user and check_password(password, user['password']):
+            request.session['user_id'] = user['user_id']
+            return JsonResponse({'message': 'Login successful'})
+        else:
+            return JsonResponse({'error': 'Invalid credentials'}, status=401)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# --- UPLOAD PROFILE PIC ---
 @csrf_exempt
-def upload_profile_picture(request):
-    if request.method == 'POST':
-        user_id = request.POST.get('user_id')
-        image = request.FILES.get('image')
+def upload_profile_picture(request, user_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
 
-        if not user_id or not image:
-            return JsonResponse({'error': 'Missing user_id or image'}, status=400)
+    image = request.FILES.get('image')
 
+    if not user_id or not image:
+        return JsonResponse({'error': 'Missing user_id or image'}, status=400)
+
+    try:
         # Save image
-        image_name = f"profile_{user_id}_{timezone.now().timestamp()}.jpg"
+        image_name = f"profile_{user_id}_{uuid.uuid4().hex}.jpg"
         save_path = os.path.join(settings.MEDIA_ROOT, 'profile_pics', image_name)
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
@@ -97,41 +127,50 @@ def upload_profile_picture(request):
         relative_path = f"media/profile_pics/{image_name}"
 
         # Update DB
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE user
-                SET profile_picture = %s
-                WHERE user_id = %s
-            """, [relative_path, user_id])
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE user SET profile_picture = %s WHERE user_id = %s
+        """, (relative_path, user_id))
+        conn.commit()
 
-        return JsonResponse({'message': 'Profile picture uploaded successfully', 'path': relative_path})
+        return JsonResponse({
+            'message': 'Profile picture uploaded successfully',
+            'image_url': request.build_absolute_uri('/' + relative_path)
+            })
 
-    return JsonResponse({'error': 'Only POST method allowed'}, status=405)
-
-@csrf_exempt
-def get_user_profile(request, user_id):
-    if request.method == 'GET':
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True)
-
-            query = """
-                SELECT user_id, first_name, last_name, bio, profile_picture_url
-                FROM user
-                WHERE user_id = %s
-            """
-            cursor.execute(query, (user_id,))
-            user = cursor.fetchone()
-
-            if user:
-                return JsonResponse(user)
-            else:
-                return JsonResponse({'error': 'User not found'}, status=404)
-
-        except mysql.connector.Error as err:
-            return JsonResponse({'error': str(err)}, status=500)
-        finally:
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        if 'cursor' in locals():
             cursor.close()
+        if 'conn' in locals():
             conn.close()
 
-    return JsonResponse({'error': 'Only GET allowed'}, status=405)
+# --- GET PROFILE ---
+@csrf_exempt
+def get_user_profile(request, user_id):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Only GET allowed'}, status=405)
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT user_id, first_name, last_name, bio, profile_picture
+            FROM user WHERE user_id = %s
+        """, (user_id,))
+        user = cursor.fetchone()
+
+        if user:
+            return JsonResponse(user)
+        else:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()

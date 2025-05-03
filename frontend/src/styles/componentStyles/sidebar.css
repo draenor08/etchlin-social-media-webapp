@@ -1,55 +1,103 @@
+/* sidebar.css */
 .sidebar {
-    flex: 3;
-    height: calc(100vh - 50px);
-    overflow-y: scroll;
-    position: sticky;
-    top: 50px;
-  }
-  
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
-  ::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: rgb(179, 179, 179);
-  }
-  
-  .sidebarWrapper {
-    padding: 20px;
-  }
-  
-  .sidebarList {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-  
-  .sidebarListItem {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebarIcon {
-    margin-right: 15px;
-  }
-  
-  .sidebarButton {
-    width: 150px;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: 500;
-  }
-  
-  .sidebarHr {
-    margin: 20px 0;
-  }
-  
-  .sidebarFriendList {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
+  flex: 3;
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
+  position: sticky;
+  top: 50px;
+  background-color: #1d3557;  /* Dark Navy Blue background */
+  color: #f1faee;  /* Light Beige text color */
+  border-right: 1px solid #f1faee;  /* Soft border to separate sidebar */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Soft shadow for depth */
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #e0fbfc;  /* Light cyan background for scroll track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #f1faee;  /* Light beige scrollbar thumb */
+  border-radius: 5px;
+}
+
+.sidebarWrapper {
+  padding: 20px;
+}
+
+.sidebarList {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sidebarListItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;  /* Smooth transition on hover */
+  border-radius: 8px;  /* Rounded corners for list items */
+}
+
+.sidebarListItem:hover {
+  background-color: #f1faee;  /* Beige hover effect */
+  color: #1d3557;  /* Dark text on hover */
+}
+
+.sidebarIcon {
+  margin-right: 15px;
+  font-size: 22px;
+}
+
+.sidebarButton {
+  width: 150px;
+  border: none;
+  padding: 12px;
+  border-radius: 25px;  /* Round button for a modern look */
+  font-weight: 500;
+  background-color: #e0fbfc;  /* Light cyan button background */
+  color: #1d3557;  /* Dark navy blue text */
+  cursor: pointer;
+  transition: background-color 0.3s ease;  /* Smooth hover effect */
+}
+
+.sidebarButton:hover {
+  background-color: #f1faee;  /* Beige background on hover */
+  color: #1d3557;  /* Keep the text color same for consistency */
+}
+
+.sidebarHr {
+  margin: 20px 0;
+  border: 0;
+  height: 1px;
+  background-color: #f1faee;  /* Light beige horizontal line */
+}
+
+.sidebarFriendList {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* Optional: Style for individual friends in friend list */
+.sidebarFriend {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sidebarFriendImg {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.sidebarFriendName {
+  font-size: 14px;
+  font-weight: 500;
+}

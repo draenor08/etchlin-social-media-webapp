@@ -1,16 +1,14 @@
 # db/mysql_connection.py
 
-import mysql.connector
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+import pymysql
+from django.conf import settings
 
 def get_connection():
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", "1234@Bcd"),
-        database=os.getenv("DB_NAME", "etchlin_db"),
-        port=os.getenv("DB_PORT", 3306)
+    return pymysql.connect(
+        host=settings.DATABASES['default']['HOST'],
+        user=settings.DATABASES['default']['USER'],
+        password=settings.DATABASES['default']['PASSWORD'],
+        db=settings.DATABASES['default']['NAME'],
+        charset='utf8mb4',  # Ensure proper encoding for extended characters
+        cursorclass=pymysql.cursors.DictCursor
     )
