@@ -1,158 +1,81 @@
-import hashlib
+import os
 import uuid
 import json
-import os
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-import mysql.connector
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.views.decorators.csrf import csrf_exempt
 
-# --- DB CONFIG ---
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': settings.DATABASES['default']['USER'],
-    'password': settings.DATABASES['default']['PASSWORD'],
-    'database': settings.DATABASES['default']['NAME'],
-}
+from backend.utils.auth import hash_password, check_password, login_required_json
+from backend.utils.db import get_db_connection
 
-def get_db_connection():
-    return mysql.connector.connect(**DB_CONFIG)
-
-# --- PASSWORD UTILS ---
-def hash_password(password):
-    salt = uuid.uuid4().hex
-    hashed = hashlib.sha256((password + salt).encode()).hexdigest()
-    return f"{hashed}${salt}"
-
-def check_password(password, hashed_with_salt):
-    hashed, salt = hashed_with_salt.split("$")
-    return hashed == hashlib.sha256((password + salt).encode()).hexdigest()
-
-# --- REGISTER ---
+# REGISTER USER
 @csrf_exempt
 def register_user(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data['email']
+            password = hash_password(data['password'])
+            first_name = data['first_name']
+            last_name = data['last_name']
 
-    try:
-        data = json.loads(request.body)
-        email = data.get('email')
-        password = data.get('password')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        date_of_birth = data.get('date_of_birth')
-        bio = data.get('bio', '')
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO user (email, password, first_name, last_name) VALUES (%s, %s, %s, %s)",
+                           (email, password, first_name, last_name))
+            conn.commit()
+            return JsonResponse({'message': 'User registered successfully'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+    return JsonResponse({'error': 'Invalid method'}, status=405)
 
-        if not all([email, password, first_name, last_name, date_of_birth]):
-            return JsonResponse({'error': 'Missing required fields'}, status=400)
-
-        hashed_password = hash_password(password)
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT user_id FROM user WHERE email = %s", (email,))
-        if cursor.fetchone():
-            return JsonResponse({'error': 'Email already exists'}, status=409)
-
-        cursor.execute("""
-            INSERT INTO user (email, password, first_name, last_name, date_of_birth, bio)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (email, hashed_password, first_name, last_name, date_of_birth, bio))
-
-        conn.commit()
-        return JsonResponse({'message': 'User registered successfully'}, status=201)
-
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
-
-# --- LOGIN ---
+# LOGIN USER
 @csrf_exempt
-def login(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST allowed'}, status=405)
+def login_user(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data['email']
+            password = data['password']
 
-    try:
-        data = json.loads(request.body)
-        email = data.get('email')
-        password = data.get('password')
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
+            user = cursor.fetchone()
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT user_id, password FROM user WHERE email=%s", (email,))
-        user = cursor.fetchone()
-
-        if user and check_password(password, user['password']):
-            request.session['user_id'] = user['user_id']
-            return JsonResponse({'message': 'Login successful'})
-        else:
+            if user and check_password(password, user['password']):
+                request.session['user_id'] = user['user_id']
+                return JsonResponse({'message': 'Login successful'})
             return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+    return JsonResponse({'error': 'Invalid method'}, status=405)
 
-# --- UPLOAD PROFILE PIC ---
+# LOGOUT
 @csrf_exempt
-def upload_profile_picture(request, user_id):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+def logout_user(request):
+    request.session.flush()
+    return JsonResponse({'message': 'Logged out successfully'})
 
-    image = request.FILES.get('image')
-
-    if not user_id or not image:
-        return JsonResponse({'error': 'Missing user_id or image'}, status=400)
-
-    try:
-        # Save image
-        image_name = f"profile_{user_id}_{uuid.uuid4().hex}.jpg"
-        save_path = os.path.join(settings.MEDIA_ROOT, 'profile_pics', image_name)
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-        with open(save_path, 'wb+') as f:
-            for chunk in image.chunks():
-                f.write(chunk)
-
-        relative_path = f"media/profile_pics/{image_name}"
-
-        # Update DB
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE user SET profile_picture = %s WHERE user_id = %s
-        """, (relative_path, user_id))
-        conn.commit()
-
-        return JsonResponse({
-            'message': 'Profile picture uploaded successfully',
-            'image_url': request.build_absolute_uri('/' + relative_path)
-            })
-
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
-
-# --- GET PROFILE ---
+# GET OWN PROFILE
 @csrf_exempt
-def get_user_profile(request, user_id):
-    if request.method != 'GET':
-        return JsonResponse({'error': 'Only GET allowed'}, status=405)
-
+@login_required_json
+def get_own_profile(request):
+    user_id = request.session.get('user_id')
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -174,3 +97,61 @@ def get_user_profile(request, user_id):
             cursor.close()
         if 'conn' in locals():
             conn.close()
+            
+# UPDATE PROFILE PICTURE
+@csrf_exempt
+@login_required_json
+def update_profile_picture(request):
+    if request.method == 'POST' and request.FILES.get('profile_picture'):
+        user_id = request.session.get('user_id')
+        profile_pic = request.FILES['profile_picture']
+        file_ext = os.path.splitext(profile_pic.name)[-1]
+        unique_filename = f"profile_{uuid.uuid4().hex}{file_ext}"
+        save_path = os.path.join('profile_pictures', unique_filename)
+
+        try:
+            full_path = default_storage.save(save_path, ContentFile(profile_pic.read()))
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE user SET profile_picture = %s WHERE user_id = %s", (full_path, user_id))
+            conn.commit()
+            return JsonResponse({'message': 'Profile picture updated', 'path': full_path})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        finally:
+            if 'cursor' in locals(): cursor.close()
+            if 'conn' in locals(): conn.close()
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+from django.http import JsonResponse
+from utils.auth import login_required_json
+from utils.db import get_db_connection
+
+@login_required_json
+def post_feed(request):
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        # Fetch user's and friends' posts, most recent first
+        cursor.execute("""
+            SELECT p.post_id, p.caption, p.image_path, p.timestamp, u.username
+            FROM post p
+            JOIN user u ON p.user_id = u.user_id
+            WHERE p.user_id = %s OR p.user_id IN (
+                SELECT CASE
+                    WHEN f.request = %s THEN f.acceptance
+                    WHEN f.acceptance = %s THEN f.request
+                END
+                FROM friends f
+                WHERE (f.request = %s OR f.acceptance = %s) AND f.status = 'accepted'
+            )
+            ORDER BY p.timestamp DESC
+        """, (user_id, user_id, user_id, user_id, user_id))
+        posts = cursor.fetchall()
+        return JsonResponse({'posts': posts})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        cursor.close()
+        conn.close()

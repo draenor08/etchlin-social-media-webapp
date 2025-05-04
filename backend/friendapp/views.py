@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
-from db.mysql_connection import get_connection
-
+from utils.auth import login_required_json
+from utils.db import get_db_connection
 @csrf_exempt
 def send_request(request):
     if request.method == 'POST':
@@ -14,7 +14,7 @@ def send_request(request):
         data = json.loads(request.body)
         receiver_id = data.get('receiver_id')
 
-        conn = get_connection()
+        conn = get_db_connection()
         cursor = conn.cursor()
         try:
             cursor.execute("INSERT INTO friends (request, acceptance, status) VALUES (%s, %s, 'pending')", (sender_id, receiver_id))
@@ -33,10 +33,13 @@ def respond_request(request):
         data = json.loads(request.body)
         requester_id = data.get('requester_id')
         action = data.get('action')  # 'accept' or 'reject'
+        if requester_id == user_id:
+            return JsonResponse({'error': 'Cannot send friend request to yourself'}, status=400)
+
 
         status = 'accepted' if action == 'accept' else 'rejected'
 
-        conn = get_connection()
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE friends SET status = %s WHERE request = %s AND acceptance = %s", (status, requester_id, user_id))
         conn.commit()
@@ -47,7 +50,7 @@ def respond_request(request):
 
 def get_friends(request):
     user_id = request.session.get('user_id')
-    conn = get_connection()
+    conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
         SELECT u.user_id, u.username
@@ -60,3 +63,4 @@ def get_friends(request):
     conn.close()
 
     return JsonResponse({'friends': friends})
+

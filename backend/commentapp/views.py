@@ -1,25 +1,30 @@
-import uuid
 from django.views.decorators.csrf import csrf_exempt
+from utils.auth import login_required_json
+from utils.db import get_db_connection
 from django.http import JsonResponse
-from django.db import connection
+import os, uuid, json
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 @csrf_exempt
+@login_required_json
 def create_comment(request):
     if request.method == 'POST':
-        user_id = request.POST.get('user_id')
-        post_id = request.POST.get('post_id')
-        content = request.POST.get('content', '')
+        user_id = request.session.get('user_id')
+        data = json.loads(request.body)
+        post_id = data['post_id']
+        comment_text = data['comment']
 
-        if not user_id or not post_id or not content:
-            return JsonResponse({'error': 'user_id, post_id, and content required'}, status=400)
-
-        comment_id = str(uuid.uuid4())[:20]
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO comment (comment_id, post_id, user_id, content)
-                VALUES (%s, %s, %s, %s)
-            """, [comment_id, post_id, user_id, content])
-
-        return JsonResponse({'success': True, 'comment_id': comment_id})
-    
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO comment (user_id, post_id, text) VALUES (%s, %s, %s)",
+                           (user_id, post_id, comment_text))
+            conn.commit()
+            return JsonResponse({'message': 'Comment added'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        finally:
+            if 'cursor' in locals(): cursor.close()
+            if 'conn' in locals(): conn.close()
+    return JsonResponse({'error': 'Invalid method'}, status=405)

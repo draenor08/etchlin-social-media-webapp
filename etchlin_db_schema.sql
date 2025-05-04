@@ -126,3 +126,9 @@ CREATE INDEX idx_flagged_posts ON post(is_flagged);
 
 ALTER TABLE user
 ADD COLUMN profile_picture VARCHAR(255) DEFAULT NULL;
+
+ALTER TABLE comment ADD COLUMN is_blurred BOOLEAN DEFAULT FALSE
+
+-- Modify the message column to allow for longer messages
+ALTER TABLE audit_list 
+MODIFY COLUMN message VARCHAR(500);

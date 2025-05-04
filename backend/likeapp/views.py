@@ -1,24 +1,35 @@
-import uuid
+import json, os, uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.db import connection
+from backend.utils.db import get_db_connection
+from backend.utils.auth import login_required_json
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 @csrf_exempt
-def create_like(request):
+@login_required_json
+def like_post(request):
     if request.method == 'POST':
-        user_id = request.POST.get('user_id')
-        post_id = request.POST.get('post_id')
+        user_id = request.session.get('user_id')
+        data = json.loads(request.body)
+        post_id = data['post_id']
 
-        if not user_id or not post_id:
-            return JsonResponse({'error': 'user_id and post_id required'}, status=400)
-
-        like_id = str(uuid.uuid4())[:24]
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO likes (like_id, post_id, user_id)
-                VALUES (%s, %s, %s)
-            """, [like_id, post_id, user_id])
-
-        return JsonResponse({'success': True, 'like_id': like_id})
-    
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM like WHERE user_id = %s AND post_id = %s", (user_id, post_id))
+            if cursor.fetchone():
+                cursor.execute("DELETE FROM like WHERE user_id = %s AND post_id = %s", (user_id, post_id))
+                message = 'Unliked'
+            else:
+                cursor.execute("INSERT INTO like (user_id, post_id) VALUES (%s, %s)", (user_id, post_id))
+                message = 'Liked'
+            conn.commit()
+            return JsonResponse({'message': message})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        finally:
+            if 'cursor' in locals(): cursor.close()
+            if 'conn' in locals(): conn.close()
+    return JsonResponse({'error': 'Invalid method'}, status=405)
