@@ -12,7 +12,7 @@ from utils.auth import hash_password, check_password, login_required_json
 from utils.db import get_db_connection
 
 def check_auth(request):
-    if request.user.is_authenticated:
+    if request.session.get('user_id'):
         return JsonResponse({'status': 'authenticated'})
     return JsonResponse({'status': 'unauthenticated'}, status=401)
 
@@ -64,10 +64,13 @@ def login_user(request):
 
             if user and check_password(password, user['password']):
                 request.session['user_id'] = user['user_id']
+                cursor.close()
+                conn.close()
                 return JsonResponse({'message': 'Login successful'})
             return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
         except Exception as e:
+            print(e)
             return JsonResponse({'error': str(e)}, status=500)
         finally:
             if 'cursor' in locals():

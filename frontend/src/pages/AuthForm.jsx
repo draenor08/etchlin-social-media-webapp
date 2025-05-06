@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styles/pageStyles/authForm.css'; // Your external CSS file
 import 'boxicons/css/boxicons.min.css'; // Boxicons CDN via npm or use link in index.html
 import api from '../api/axiosConfig'; // or wherever you set up Axios with baseURL
+import { useNavigate } from 'react-router-dom';
 
 const AuthForm = () => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -13,6 +14,8 @@ const AuthForm = () => {
   email: '',
   password: ''
   });
+
+  const navigate = useNavigate();
 
   const handleLoginChange = (e) => {
     setLoginData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -28,6 +31,7 @@ const AuthForm = () => {
       const res = await api.post('login/', loginData);
       alert("Login successful!");
       console.log(res.data);
+      navigate('/');
     } catch (err) {
       alert(err.response?.data?.error || "Login failed");
     }
@@ -38,6 +42,7 @@ const AuthForm = () => {
     try {
       const res = await api.post('register/', registerData);
       alert("Registration successful!");
+      console.log(res.data);
       setIsRegistering(false); // go to login
     } catch (err) {
       alert(err.response?.data?.error || "Registration failed");
@@ -57,7 +62,7 @@ const AuthForm = () => {
             <input type="password" name="password" placeholder="Password" required value={loginData.password} onChange={handleLoginChange} />
             <i className='bx bxs-lock-alt'></i>
           </div>
-          <div className="forgot-link"><a href="#">Forgot Password?</a></div>
+          <div className="forgot-link"><p>Forgot Password?</p></div>
           <button type="submit" className="btn">Login</button>
         </form>
 
