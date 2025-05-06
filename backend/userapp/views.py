@@ -8,8 +8,13 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.utils.auth import hash_password, check_password, login_required_json
-from backend.utils.db import get_db_connection
+from utils.auth import hash_password, check_password, login_required_json
+from utils.db import get_db_connection
+
+def check_auth(request):
+    if request.user.is_authenticated:
+        return JsonResponse({'status': 'authenticated'})
+    return JsonResponse({'status': 'unauthenticated'}, status=401)
 
 # REGISTER USER
 @csrf_exempt
@@ -21,11 +26,16 @@ def register_user(request):
             password = hash_password(data['password'])
             first_name = data['first_name']
             last_name = data['last_name']
+            date_of_birth = data['dob']  
 
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO user (email, password, first_name, last_name) VALUES (%s, %s, %s, %s)",
-                           (email, password, first_name, last_name))
+            
+            cursor.execute("""
+                INSERT INTO user (email, password, first_name, last_name, date_of_birth)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (email, password, first_name, last_name, date_of_birth))
+            
             conn.commit()
             return JsonResponse({'message': 'User registered successfully'})
         except Exception as e:
@@ -36,6 +46,7 @@ def register_user(request):
             if 'conn' in locals():
                 conn.close()
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
 
 # LOGIN USER
 @csrf_exempt
@@ -101,7 +112,7 @@ def get_own_profile(request):
 # UPDATE PROFILE PICTURE
 @csrf_exempt
 @login_required_json
-def update_profile_picture(request):
+def upload_profile_picture(request):
     if request.method == 'POST' and request.FILES.get('profile_picture'):
         user_id = request.session.get('user_id')
         profile_pic = request.FILES['profile_picture']

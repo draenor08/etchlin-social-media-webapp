@@ -1,7 +1,12 @@
-.feed{
-    flex:5.5
-}
-
-.feedWrapper{
+.feed {
+    flex: 5.5;
+    background-color: #f5f3f0; /* light beige background */
+  }
+  
+  .feedWrapper {
     padding: 20px;
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  

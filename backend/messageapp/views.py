@@ -1,8 +1,8 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
-from backend.utils.auth import login_required_json
-from backend.utils.db import get_db_connection
+from utils.auth import login_required_json
+from utils.db import get_db_connection
 
 @csrf_exempt
 @login_required_json

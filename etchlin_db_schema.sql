@@ -2,7 +2,7 @@ USE etchlin_db;
 
 -- USER TABLE
 CREATE TABLE user (
-    user_id VARCHAR(12) PRIMARY KEY,
+    user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     bio VARCHAR(250),
@@ -13,26 +13,26 @@ CREATE TABLE user (
 
 -- ADMIN TABLE
 CREATE TABLE admin (
-    admin_id CHAR(4) PRIMARY KEY,
-    user_id VARCHAR(12),
+    admin_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
 -- POST TABLE
 CREATE TABLE post (
-    post_id VARCHAR(16) PRIMARY KEY,
-    user_id VARCHAR(12),
+    post_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
     caption VARCHAR(2200),
-    image_url VARCHAR(255) NOT NULL, -- image required
+    image_url VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
 -- COMMENT TABLE
 CREATE TABLE comment (
-    comment_id VARCHAR(20) PRIMARY KEY,
-    post_id VARCHAR(16),
-    user_id VARCHAR(12),
+    comment_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    post_id INT,
+    user_id INT,
     content VARCHAR(250),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES post(post_id),
@@ -41,8 +41,8 @@ CREATE TABLE comment (
 
 -- COMMENT LIST TABLE (junction table, possibly redundant)
 CREATE TABLE comment_list (
-    post_id VARCHAR(16),
-    comment_id VARCHAR(20),
+    post_id INT,
+    comment_id INT,
     FOREIGN KEY (post_id) REFERENCES post(post_id),
     FOREIGN KEY (comment_id) REFERENCES comment(comment_id),
     PRIMARY KEY (post_id, comment_id)
@@ -50,9 +50,9 @@ CREATE TABLE comment_list (
 
 -- LIKE TABLE
 CREATE TABLE likes (
-    like_id VARCHAR(24) PRIMARY KEY,
-    post_id VARCHAR(16),
-    user_id VARCHAR(12),
+    like_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    post_id INT,
+    user_id INT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES post(post_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
@@ -61,8 +61,8 @@ CREATE TABLE likes (
 -- MESSAGE TABLE
 CREATE TABLE message (
     message_number INT AUTO_INCREMENT PRIMARY KEY,
-    sender_id VARCHAR(12),
-    receiver_id VARCHAR(12),
+    sender_id INT,
+    receiver_id INT,
     text VARCHAR(1000),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES user(user_id),
@@ -71,8 +71,8 @@ CREATE TABLE message (
 
 -- FRIENDS TABLE
 CREATE TABLE friends (
-    request VARCHAR(12),
-    acceptance VARCHAR(12),
+    request INT,
+    acceptance INT,
     FOREIGN KEY (request) REFERENCES user(user_id),
     FOREIGN KEY (acceptance) REFERENCES user(user_id),
     PRIMARY KEY (request, acceptance)
@@ -80,11 +80,11 @@ CREATE TABLE friends (
 
 -- AUDIT LIST TABLE
 CREATE TABLE audit_list (
-    admin_id CHAR(4),
-    user_id VARCHAR(12),
-    post_id VARCHAR(16),
-    comment_id VARCHAR(20),
-    message VARCHAR(15),
+    admin_id INT,
+    user_id INT,
+    post_id INT,
+    comment_id INT,
+    message VARCHAR(250),
     FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id),
     FOREIGN KEY (post_id) REFERENCES post(post_id),
@@ -95,6 +95,7 @@ CREATE TABLE audit_list (
 CREATE INDEX idx_user_email ON user(email);
 CREATE INDEX idx_post_timestamp ON post(timestamp);
 CREATE INDEX idx_comment_timestamp ON comment(timestamp);
+
 
 -- Add status column with ENUM
 ALTER TABLE friends 

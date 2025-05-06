@@ -7,10 +7,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('userapp.urls')),
-    path('api/post/', include('postapp.urls')),
-    path('api/comment/', include('commentapp.urls')),
-    path('api/like/', include('likeapp.urls')),
-    path('api/message/', include('messageapp.urls')),
+    path('api/', include('postapp.urls')),
+    path('api/', include('commentapp.urls')),
+    path('api/', include('likeapp.urls')),
+    path('api/', include('messageapp.urls')),
 ] 
 
 if settings.DEBUG:

@@ -1,17 +1,45 @@
 import React, { useState } from 'react';
-import { PermMedia, EmojiEmotions } from '@mui/icons-material';
+import { PermMedia } from '@mui/icons-material';
 import '../styles/componentStyles/share.css';
 
 function Share() {
     const [postText, setPostText] = useState('');
     const [file, setFile] = useState(null);
+    const [filePreview, setFilePreview] = useState(null);
 
     const handleFileChange = (e) => {
-        setFile(URL.createObjectURL(e.target.files[0]));
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
+        setFilePreview(URL.createObjectURL(selectedFile));
     };
 
-    const handleSubmit = () => {
-        // Send post to backend using POST request
+    const handleSubmit = async () => {
+        if (!postText && !file) return;
+
+        const formData = new FormData();
+        formData.append('caption', postText);
+        if (file) {
+            formData.append('image', file);
+        }
+
+        try {
+            const response = await fetch('/api/posts/create/', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            if (response.ok) {
+                setPostText('');
+                setFile(null);
+                setFilePreview(null);
+                // Optionally refresh feed
+            } else {
+                console.error("Post failed");
+            }
+        } catch (error) {
+            console.error("Error submitting post:", error);
+        }
     };
 
     return (
@@ -29,19 +57,20 @@ function Share() {
                 <hr className="shareHr" />
                 <div className="shareBottom">
                     <div className="shareOptions">
-                        <div className="shareOption">
+                        <label className="shareOption">
                             <PermMedia htmlColor="tomato" className="shareIcon" />
-                            <span className="shareOptionText">Photo/Video</span>
-                            <input type="file" className="shareOptionInput" onChange={handleFileChange} />
-                        </div>
-                        <div className="shareOption">
-                            <EmojiEmotions htmlColor="goldenrod" className="shareIcon" />
-                            <span className="shareOptionText">Feelings/Activity</span>
-                        </div>
+                            <span className="shareOptionText">Photo</span>
+                            <input 
+                                type="file" 
+                                className="shareOptionInput" 
+                                onChange={handleFileChange} 
+                                style={{ display: 'none' }}
+                            />
+                        </label>
                     </div>
                     <button className="shareButton" onClick={handleSubmit}>Post</button>
                 </div>
-                {file && <img src={file} alt="" className="shareImg" />}
+                {filePreview && <img src={filePreview} alt="preview" className="shareImg" />}
             </div>
         </div>
     );

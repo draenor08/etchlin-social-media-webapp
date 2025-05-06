@@ -2,8 +2,8 @@ import json, os, uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.db import connection
-from backend.utils.db import get_db_connection
-from backend.utils.auth import login_required_json
+from utils.db import get_db_connection
+from utils.auth import login_required_json
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 

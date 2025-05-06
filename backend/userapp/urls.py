@@ -2,12 +2,12 @@ from django.urls import path
 from . import views  # this imports from userapp/views.py
 
 urlpatterns = [
+    path('api/check-auth/', views.check_auth),
     path('register/', views.register_user, name='register'),
     path('login/', views.login_user, name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('me/', views.get_own_profile, name='get_own_profile'),
-    path('<str:user_id>/', views.get_user_profile, name='get_user_profile'),
-    path('<str:user_id>/profile-picture/', views.upload_profile_picture, name='upload_profile_picture'), 
+    path('<str:user_id>/profile-picture/', views.upload_profile_picture, name='upload_profile_picture'),
 ]
 
 '''urlpatterns = [

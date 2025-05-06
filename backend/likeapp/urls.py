@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import create_like
+from .views import like_post
 
 urlpatterns = [
-    path('like/', create_like, name='create_like'),
+    path('like/', like_post, name='create_like'),
 ]

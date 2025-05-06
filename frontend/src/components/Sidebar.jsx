@@ -11,7 +11,7 @@ import {
   School
 } from '@mui/icons-material';
 import { Users } from "../dummyData";
-import CloseFriend from "./CloseFriend";
+import CloseFriend from "./Friends";
 
 export default function Sidebar() {
   return (
