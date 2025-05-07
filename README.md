@@ -1,5 +1,3 @@
----
-
 ```markdown
 # ✨ Etchlin - A Classy Social Media WebApp 👥📸
 
