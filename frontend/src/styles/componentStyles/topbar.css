@@ -1,44 +1,72 @@
+/* Topbar.css */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap');
+/* Topbar.css */
+
+:root {
+  --topbar-bg: #1d3557;        /* Deep navy blue */
+  --topbar-text: #FAF3E0;      /* Soft beige */
+  --topbar-border: #1d3557;    /* Slightly lighter navy */
+  --search-bg: #FAF3E0;        /* Navy variant */
+  --search-text: #36362e;
+  --accent-gold: #8a8a79;
+}
+
 .topbar {
-  width: 100%;
-  height: 60px;
-  background-color: #1d3557;
-  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--topbar-bg);
+  color: var(--topbar-text);
+  border-bottom: 1px solid var(--topbar-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.topbar-left .logo {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  font-family: 'Georgia', serif;
+  text-decoration: none;
+}
+
+.topbar-center .search-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--topbar-border);
+  border-radius: 20px;
+  background-color: var(--search-bg);
+  color: var(--search-text);
+  width: 300px;
+}
+
+.search-input::placeholder {
+  color: #bfbfbf;
+}
+
+.topbar-right {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  font-family: 'Georgia', serif;
+  gap: 1.25rem;
 }
 
-.topbar h1 {
-  font-size: 24px;
-  color: #f1faee;
-  margin: 0;
-}
-
-.topbar i {
-  font-size: 20px;
+.icon-button,
+.logout-button {
+  background: none;
+  border: none;
+  color: var(--topbar-text);
+  font-weight: 500;
   cursor: pointer;
-  color: #f1faee;
 }
 
-/* Responsive Styles */
-@media only screen and (max-width: 768px) {
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    height: auto;
-    padding: 10px;
-  }
-
-  .topbar h1 {
-    font-size: 20px;
-  }
+.icon-button:hover,
+.logout-button:hover {
+  color: var(--accent-gold);
 }
 
-@media only screen and (max-width: 480px) {
-  .topbar h1 {
-    font-size: 18px;
-  }
+.profile-link .profile-pic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-gold);
+  object-fit: cover;
 }

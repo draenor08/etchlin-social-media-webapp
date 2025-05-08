@@ -48,19 +48,30 @@ def respond_request(request):
 
         return JsonResponse({'message': f'Request {status}'})
 
+@login_required_json
 def get_friends(request):
     user_id = request.session.get('user_id')
+    
+    if not user_id:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT u.user_id, u.username
-        FROM friends f 
-        JOIN user u ON f.request = u.user_id OR f.acceptance = u.user_id
-        WHERE (f.request = %s OR f.acceptance = %s) AND f.status = 'accepted' AND u.user_id != %s
-    """, (user_id, user_id, user_id))
-    friends = cursor.fetchall()
-    cursor.close()
-    conn.close()
+    try:
+        cursor.execute("""
+            SELECT u.user_id, u.first_name, u.last_name, u.profile_picture_path
+            FROM friends f 
+            JOIN user u ON (f.request = u.user_id OR f.acceptance = u.user_id)
+            WHERE (f.request = %s OR f.acceptance = %s) 
+            AND f.status = 'accepted' 
+            AND u.user_id != %s
+        """, (user_id, user_id, user_id))
+        friends = cursor.fetchall()
+    except Exception as e:
+        print("Database Error:", e)
+        return JsonResponse({'error': 'Database error'}, status=500)
+    finally:
+        cursor.close()
+        conn.close()
 
     return JsonResponse({'friends': friends})
-

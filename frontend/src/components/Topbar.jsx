@@ -1,12 +1,28 @@
-import SearchBar from './SearchBar';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { BellIcon } from 'lucide-react';
 import '../styles/componentStyles/topbar.css';
 
-const TopBar = ({ onUserSelect }) => (
-  <div className="top-bar">
-    <h1>Etchlin</h1>
-    <SearchBar onUserSelect={onUserSelect} />
-    <i className="bx bx-bell"></i> {/* Notification placeholder */}
-  </div>
-);
+const Topbar = ({ userId, userProfilePic, handleNotifClick, logout }) => {
+  return (
+    <header className="topbar">
+      <div className="topbar-left">
+        <Link to="/" className="logo">Etchlin</Link>
+      </div>
+      <div className="topbar-center">
+        <input type="text" placeholder="Search..." className="search-input" />
+      </div>
+      <div className="topbar-right">
+        <button className="icon-button" onClick={handleNotifClick}>
+          <BellIcon size={20} />
+        </button>
+        <Link to={`/profile/${userId}`} className="profile-link">
+          <img src={userProfilePic} alt="Profile" className="profile-pic" />
+        </Link>
+        <button className="logout-button" onClick={logout}>Logout</button>
+      </div>
+    </header>
+  );
+};
 
-export default TopBar;
+export default Topbar;

@@ -8,12 +8,31 @@ import {
   HelpOutline,
   WorkOutline,
   Event,
-  School
-} from '@mui/icons-material';
-import { Users } from "../dummyData";
-import CloseFriend from "./Friends";
+  School,
+  MessageRounded,
+} from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
+  const [friends, setFriends] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/friends/", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        setFriends(data.friends || []);
+      } catch (error) {
+        console.error("Failed to fetch friends:", error);
+      }
+    };
+    fetchFriends();
+  }, []);
+
   return (
     <div className="sidebar">
       <div className="sidebarWrapper">
@@ -58,8 +77,23 @@ export default function Sidebar() {
         <button className="sidebarButton">Show More</button>
         <hr className="sidebarHr" />
         <ul className="sidebarFriendList">
-          {Users.map((u) => (
-            <CloseFriend key={u.id} user={u} />
+          {friends.map(friend => (
+            <li key={friend.user_id} className="sidebarFriendItem">
+              <div className="friendDetails" onClick={() => navigate(`/messages/${friend.user_id}`)}>
+                <img
+                  src={friend.profile_picture_path || "/assets/default-profile.png"}
+                  alt={friend.username}
+                  className="sidebarFriendImg"
+                />
+                <span className="sidebarFriendName">
+                  {friend.first_name} {friend.last_name}
+                </span>
+              </div>
+              <MessageRounded
+                className="messageIcon"
+                onClick={() => navigate(`/messages/${friend.user_id}`)}
+              />
+            </li>
           ))}
         </ul>
       </div>
