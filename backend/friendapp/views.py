@@ -59,13 +59,13 @@ def get_friends(request):
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""
-            SELECT u.user_id, u.first_name, u.last_name, u.profile_picture_path
+            SELECT u.user_id, u.first_name, u.last_name, u.profile_picture
             FROM friends f 
             JOIN user u ON (f.request = u.user_id OR f.acceptance = u.user_id)
             WHERE (f.request = %s OR f.acceptance = %s) 
             AND f.status = 'accepted' 
             AND u.user_id != %s
-        """, (user_id, user_id, user_id))
+            """, (user_id, user_id, user_id))
         friends = cursor.fetchall()
     except Exception as e:
         print("Database Error:", e)

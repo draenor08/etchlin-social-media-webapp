@@ -46,7 +46,7 @@ function Share() {
         <div className="share">
             <div className="shareWrapper">
                 <div className="shareTop">
-                    <img src="path_to_profile_pic" alt="" className="shareProfileImg" />
+                    <img src="profile_picture" alt="" className="shareProfileImg" />
                     <input 
                         placeholder="What's on your mind?" 
                         className="shareInput" 

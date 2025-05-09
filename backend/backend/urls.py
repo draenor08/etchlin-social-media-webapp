@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/', include('commentapp.urls')),
     path('api/', include('likeapp.urls')),
     path('api/', include('messageapp.urls')),
+    path('api/', include('friendapp.urls')),
 ] 
 
 if settings.DEBUG:

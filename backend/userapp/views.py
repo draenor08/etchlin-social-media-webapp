@@ -11,6 +11,28 @@ from django.views.decorators.csrf import csrf_exempt
 from utils.auth import hash_password, check_password, login_required_json
 from utils.db import get_db_connection
 
+
+def get_user_info(request):
+    user_id = request.session.get('user_id')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT user_id, first_name, last_name, profile_picture FROM user WHERE user_id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+    except Exception as e:
+        print("Database error in get_user_info:", e)
+        return JsonResponse({'error': 'Database error'}, status=500)
+    finally:
+        cursor.close()
+        conn.close()
+
+    return JsonResponse({'user': user})
+
 def check_auth(request):
     if request.session.get('user_id'):
         return JsonResponse({'status': 'authenticated'})
@@ -88,7 +110,7 @@ def logout_user(request):
 # GET OWN PROFILE
 @csrf_exempt
 @login_required_json
-def get_own_profile(request):
+def get_profile(request):
     user_id = request.session.get('user_id')
     try:
         conn = get_db_connection()
@@ -136,36 +158,3 @@ def upload_profile_picture(request):
             if 'cursor' in locals(): cursor.close()
             if 'conn' in locals(): conn.close()
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-from django.http import JsonResponse
-from utils.auth import login_required_json
-from utils.db import get_db_connection
-
-@login_required_json
-def post_feed(request):
-    user_id = request.session.get('user_id')
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    try:
-        # Fetch user's and friends' posts, most recent first
-        cursor.execute("""
-            SELECT p.post_id, p.caption, p.image_path, p.timestamp, u.username
-            FROM post p
-            JOIN user u ON p.user_id = u.user_id
-            WHERE p.user_id = %s OR p.user_id IN (
-                SELECT CASE
-                    WHEN f.request = %s THEN f.acceptance
-                    WHEN f.acceptance = %s THEN f.request
-                END
-                FROM friends f
-                WHERE (f.request = %s OR f.acceptance = %s) AND f.status = 'accepted'
-            )
-            ORDER BY p.timestamp DESC
-        """, (user_id, user_id, user_id, user_id, user_id))
-        posts = cursor.fetchall()
-        return JsonResponse({'posts': posts})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    finally:
-        cursor.close()
-        conn.close()

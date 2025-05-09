@@ -6,8 +6,10 @@ urlpatterns = [
     path('register/', views.register_user, name='register'),
     path('login/', views.login_user, name='login'),
     path('logout/', views.logout_user, name='logout'),
-    path('me/', views.get_own_profile, name='get_own_profile'),
-    path('<str:user_id>/profile-picture/', views.upload_profile_picture, name='upload_profile_picture'),
+    path('profile/<str:user_id>/', views.get_profile, name='get_profile'),
+    path('profile-picture/<str:user_id>/', views.upload_profile_picture, name='upload_profile_picture'),
+    path('auth/user/', views.get_user_info, name='get_user_info'),
+
 ]
 
 '''urlpatterns = [

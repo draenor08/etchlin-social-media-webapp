@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const OtherProfilePage = () => {
+const ProfilePage = () => {
   const { id } = useParams();
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
@@ -29,4 +29,4 @@ const OtherProfilePage = () => {
   );
 };
 
-export default OtherProfilePage;
+export default ProfilePage;

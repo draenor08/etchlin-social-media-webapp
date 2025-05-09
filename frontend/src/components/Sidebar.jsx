@@ -81,8 +81,8 @@ export default function Sidebar() {
             <li key={friend.user_id} className="sidebarFriendItem">
               <div className="friendDetails" onClick={() => navigate(`/messages/${friend.user_id}`)}>
                 <img
-                  src={friend.profile_picture_path || "/assets/default-profile.png"}
-                  alt={friend.username}
+                  src={friend.profile_picture}
+                  alt={"/assets/default-profile.png"}
                   className="sidebarFriendImg"
                 />
                 <span className="sidebarFriendName">

@@ -4,7 +4,7 @@
 
 :root {
   --topbar-bg: #1d3557;        /* Deep navy blue */
-  --topbar-text: #FAF3E0;      /* Soft beige */
+  --topbar-text: #Ffff;      /* Soft beige */
   --topbar-border: #1d3557;    /* Slightly lighter navy */
   --search-bg: #FAF3E0;        /* Navy variant */
   --search-text: #36362e;
@@ -25,7 +25,7 @@
 .topbar-left .logo {
   font-size: 1.8rem;
   font-weight: 600;
-  color: var(--accent-gold);
+  color: #e0fbfc;
   font-family: 'Georgia', serif;
   text-decoration: none;
 }
@@ -66,7 +66,8 @@
 .profile-link .profile-pic {
   width: 36px;
   height: 36px;
+  color: #FAF3E0;
   border-radius: 50%;
-  border: 2px solid var(--accent-gold);
+  border: 2px solid #FAF3E0;
   object-fit: cover;
 }

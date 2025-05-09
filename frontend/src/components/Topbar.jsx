@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BellIcon } from 'lucide-react';
+import { BellIcon, User } from 'lucide-react';
 import '../styles/componentStyles/topbar.css';
 
 const Topbar = ({ userId, userProfilePic, handleNotifClick, logout }) => {
@@ -16,8 +16,8 @@ const Topbar = ({ userId, userProfilePic, handleNotifClick, logout }) => {
         <button className="icon-button" onClick={handleNotifClick}>
           <BellIcon size={20} />
         </button>
-        <Link to={`/profile/${userId}`} className="profile-link">
-          <img src={userProfilePic} alt="Profile" className="profile-pic" />
+        <Link to={`api/profile/${userId}`} className="profile-link">
+          <User className="profile-pic" />
         </Link>
         <button className="logout-button" onClick={logout}>Logout</button>
       </div>
