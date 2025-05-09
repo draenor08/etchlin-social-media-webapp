@@ -1,3 +1,6 @@
+-- DATABASE SETUP
+DROP DATABASE IF EXISTS etchlin_db;
+CREATE DATABASE etchlin_db;
 USE etchlin_db;
 
 -- USER TABLE
@@ -6,9 +9,10 @@ CREATE TABLE user (
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     bio VARCHAR(250),
-    password VARCHAR(100), -- for storing hashed password
+    password VARCHAR(100),
     date_of_birth DATE,
-    email VARCHAR(100)
+    email VARCHAR(100),
+    profile_picture VARCHAR(255) DEFAULT NULL
 );
 
 -- ADMIN TABLE
@@ -25,7 +29,10 @@ CREATE TABLE post (
     caption VARCHAR(2200),
     image_url VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+    is_flagged BOOLEAN DEFAULT FALSE,
+    flag_reason VARCHAR(500),
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    CONSTRAINT chk_post_content CHECK (caption IS NOT NULL OR image_url IS NOT NULL)
 );
 
 -- COMMENT TABLE
@@ -35,17 +42,9 @@ CREATE TABLE comment (
     user_id INT,
     content VARCHAR(250),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_blurred BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (post_id) REFERENCES post(post_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
-);
-
--- COMMENT LIST TABLE (junction table, possibly redundant)
-CREATE TABLE comment_list (
-    post_id INT,
-    comment_id INT,
-    FOREIGN KEY (post_id) REFERENCES post(post_id),
-    FOREIGN KEY (comment_id) REFERENCES comment(comment_id),
-    PRIMARY KEY (post_id, comment_id)
 );
 
 -- LIKE TABLE
@@ -69,13 +68,16 @@ CREATE TABLE message (
     FOREIGN KEY (receiver_id) REFERENCES user(user_id)
 );
 
--- FRIENDS TABLE
+-- FRIENDS TABLE (one-way friendship model)
 CREATE TABLE friends (
     request INT,
     acceptance INT,
+    status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (request) REFERENCES user(user_id),
     FOREIGN KEY (acceptance) REFERENCES user(user_id),
-    PRIMARY KEY (request, acceptance)
+    PRIMARY KEY (request, acceptance),
+    CONSTRAINT chk_friends_order CHECK (request < acceptance)
 );
 
 -- AUDIT LIST TABLE
@@ -84,7 +86,7 @@ CREATE TABLE audit_list (
     user_id INT,
     post_id INT,
     comment_id INT,
-    message VARCHAR(250),
+    message VARCHAR(500),
     FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id),
     FOREIGN KEY (post_id) REFERENCES post(post_id),
@@ -92,44 +94,60 @@ CREATE TABLE audit_list (
     PRIMARY KEY (admin_id, user_id, post_id, comment_id)
 );
 
+-- INDEXES
 CREATE INDEX idx_user_email ON user(email);
+CREATE INDEX idx_user_name ON user(first_name, last_name);
 CREATE INDEX idx_post_timestamp ON post(timestamp);
+CREATE INDEX idx_flagged_posts ON post(is_flagged);
 CREATE INDEX idx_comment_timestamp ON comment(timestamp);
-
-
--- Add status column with ENUM
-ALTER TABLE friends 
-ADD COLUMN status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending';
-
--- Add created_at timestamp column
-ALTER TABLE friends 
-ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-
--- Add CHECK constraint to ensure consistent ordering
-ALTER TABLE friends 
-ADD CONSTRAINT chk_friends_order CHECK (request < acceptance);
-
--- Create indexes for performance
 CREATE INDEX idx_request ON friends(request);
 CREATE INDEX idx_acceptance ON friends(acceptance);
 
-ALTER TABLE post 
-ADD CONSTRAINT chk_post_content CHECK (caption IS NOT NULL OR image_url IS NOT NULL);
+-- OPTIONAL DUMMY USERS (edit as needed)
+INSERT INTO user (first_name, last_name, email, password, bio)
+VALUES 
+('Abi', 'Nana', 'abi@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Just vibing'),
+('Dummy', 'One', 'd1@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 1'),
+('Dummy', 'Two', 'd2@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 2'),
+('Dummy', 'Three', 'd3@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 3'),
+('Dummy', 'Four', 'd4@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 4'),
+('Dummy', 'Five', 'd5@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 5'),
+('Dummy', 'Six', 'd6@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 6'),
+('Dummy', 'Seven', 'd7@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 7'),
+('Dummy', 'Eight', 'd8@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 8'),
+('Dummy', 'Nine', 'd9@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 9');
 
-DROP TABLE comment_list;
+-- FRIENDSHIPS (Abi follows all)
+INSERT INTO friends (request, acceptance, status)
+VALUES
+(1, 2, 'accepted'), (1, 3, 'accepted'), (1, 4, 'accepted'),
+(1, 5, 'accepted'), (1, 6, 'accepted'), (1, 7, 'accepted'),
+(1, 8, 'accepted'), (1, 9, 'accepted'), (1, 10, 'accepted');
 
-ALTER TABLE post 
-ADD COLUMN is_flagged BOOLEAN DEFAULT FALSE,
-ADD COLUMN flag_reason VARCHAR(500);
+-- POSTS (one per dummy user)
+INSERT INTO post (user_id, caption, image_url)
+VALUES 
+(2, 'Sunset hikes are the best.', 'assets/post/1.jpeg'),
+(3, 'Trying out my new camera 📸', 'assets/post/2.jpeg'),
+(4, 'Weekend vibes with coffee.', 'assets/post/3.jpeg'),
+(5, 'Beach day with the squad!', 'assets/post/4.jpeg'),
+(6, 'Morning runs hit different.', 'assets/post/5.jpeg'),
+(7, 'Chilling with my doggo 🐶', 'assets/post/6.jpeg'),
+(8, 'Old books, new memories.', 'assets/post/7.jpeg'),
+(9, 'Cloudy skies, moody mind.', 'assets/post/8.jpeg'),
+(10, 'Candid shot by a friend.', 'assets/post/9.jpeg'),
+(2, 'Nothing like homemade food.', 'assets/post/10.jpeg');
 
-CREATE INDEX idx_user_name ON user(first_name, last_name);
-CREATE INDEX idx_flagged_posts ON post(is_flagged);
-
-ALTER TABLE user
-ADD COLUMN profile_picture VARCHAR(255) DEFAULT NULL;
-
-ALTER TABLE comment ADD COLUMN is_blurred BOOLEAN DEFAULT FALSE
-
--- Modify the message column to allow for longer messages
-ALTER TABLE audit_list 
-MODIFY COLUMN message VARCHAR(500);
+-- COMMENTS (loop-style)
+INSERT INTO comment (post_id, user_id, content)
+VALUES 
+(1, 3, 'Beautiful shot! 🔥'),
+(2, 4, 'Love this vibe!'),
+(3, 5, 'This is so calming.'),
+(4, 6, 'Epic memories bro!'),
+(5, 7, 'Healthy mornings are the best.'),
+(6, 8, 'Cute dog!'),
+(7, 9, 'Nice book collection!'),
+(8, 10, 'You ok bud? Looks gloomy.'),
+(9, 2, 'Great composition!'),
+(10, 3, 'Yummy! Save some for me.');
