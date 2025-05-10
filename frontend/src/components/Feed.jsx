@@ -23,7 +23,7 @@ export default function Feed() {
           const shaped = data.posts.map(p => ({
             id:            p.post_id,
             user_id:       p.user_id,
-            first_name:      p.first_name,            // or `${p.first_name} ${p.last_name}`
+            first_name:    p.first_name,            // or `${p.first_name} ${p.last_name}`
             profilePicture:p.profile_picture,
             caption:       p.caption,
             image:         p.image_url,
@@ -98,6 +98,7 @@ export default function Feed() {
         <Share />
         {posts.map(post => (
           <Post
+            key = {post.post_id}
             post={post}
             onLike={() => handleLike(post.id)}
             onComment={text => handleComment(post.id, text)}

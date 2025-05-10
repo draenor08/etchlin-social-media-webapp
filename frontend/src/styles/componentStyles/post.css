@@ -50,6 +50,25 @@
   color: #1d3557;
 }
 
+.postCaption {
+  margin-bottom: 10px;
+}
+
+.postImageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.postImg {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  object-fit: cover;
+}
+
+
 .postCenter {
   margin-top: 15px;
 }

@@ -16,9 +16,8 @@ function Post({ post, onLike, onComment }) {
             setCommentText('');
         }
     };
-
-    const profilePicUrl = post.profile_picture ? `http://localhost:8000${post.profile_picture}` : '/assets/default_profile.png';
-    const postImageUrl = post.image_url ? `http://localhost:8000${post.image_url}` : '';
+    const profilePicUrl = post.profilePicture ? `http://localhost:8000${post.profilePicture}` : '/assets/default_profile.png';
+    const postImageUrl = post.image ? `http://localhost:8000${post.image}` : '';
 
     return (
         <div className="post">
@@ -34,8 +33,16 @@ function Post({ post, onLike, onComment }) {
                     </div>
                 </div>
                 <div className="postCenter">
-                    {post.caption && <span className="postText">{post.caption}</span>}
-                    {post.image_url && <img src={postImageUrl} alt="Post" className="postImg" />}
+                    {post.caption && (
+                        <div className="postCaption">
+                            <span className="postText">{post.caption}</span>
+                        </div>
+                    )}
+                    {post.image && (
+                        <div className="postImageWrapper">
+                            <img src={postImageUrl} alt="Post" className="postImg" />
+                        </div>
+                    )}
                 </div>
                 <div className="postBottom">
                     <div className="postBottomLeft">
@@ -54,8 +61,8 @@ function Post({ post, onLike, onComment }) {
                 {showComments && (
                     <div className="postComments">
                         <div className="existingComments">
-                            {post.comments?.map((c) => (
-                                <div key={c.comment_id} className="comment">
+                            {post.comments?.map((c, index) => (
+                                <div key={c.comment_id || index} className="comment">
                                     <strong>{c.first_name}:</strong> {c.content}
                                 </div>
                             ))}
