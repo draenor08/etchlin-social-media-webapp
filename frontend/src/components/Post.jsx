@@ -7,24 +7,27 @@ function Post({ post, onLike, onComment }) {
     const [showComments, setShowComments] = useState(false);
 
     const handleLikeClick = () => {
-        onLike(post.id);
+        onLike(post.post_id);
     };
 
     const handleCommentSubmit = () => {
         if (commentText.trim()) {
-            onComment(post.id, commentText);
+            onComment(post, commentText);
             setCommentText('');
         }
     };
+
+    const profilePicUrl = post.profile_picture ? `http://localhost:8000${post.profile_picture}` : '/assets/default_profile.png';
+    const postImageUrl = post.image_url ? `http://localhost:8000${post.image_url}` : '';
 
     return (
         <div className="post">
             <div className="postWrapper">
                 <div className="postTop">
                     <div className="postTopLeft">
-                        <img src={post.user_profile_pic} alt="" className="postProfileImg" />
-                        <span className="postUsername">{post.user_name}</span>
-                        <span className="postDate">{post.created_at}</span>
+                        <img src={profilePicUrl} alt="Profile" className="postProfileImg" />
+                        <span className="postUsername">{post.first_name}</span>
+                        <span className="postDate">{new Date(post.timestamp).toLocaleDateString()}</span>
                     </div>
                     <div className="postTopRight">
                         <MoreVert />
@@ -32,7 +35,7 @@ function Post({ post, onLike, onComment }) {
                 </div>
                 <div className="postCenter">
                     {post.caption && <span className="postText">{post.caption}</span>}
-                    {post.image_url && <img src={post.image_url} alt="" className="postImg" />}
+                    {post.image_url && <img src={postImageUrl} alt="Post" className="postImg" />}
                 </div>
                 <div className="postBottom">
                     <div className="postBottomLeft">
@@ -51,9 +54,9 @@ function Post({ post, onLike, onComment }) {
                 {showComments && (
                     <div className="postComments">
                         <div className="existingComments">
-                            {post.comments?.map((c, index) => (
-                                <div key={index} className="comment">
-                                    <strong>{c.user_name}:</strong> {c.content}
+                            {post.comments?.map((c) => (
+                                <div key={c.comment_id} className="comment">
+                                    <strong>{c.first_name}:</strong> {c.content}
                                 </div>
                             ))}
                         </div>

@@ -3,5 +3,5 @@ from .views import create_post, user_feed
 
 urlpatterns = [
     path('post/create/', create_post, name='create_post'),
-    path('feed/', user_feed, name='user_feed'),
+    path('post/feed/', user_feed, name='user_feed'),
 ]

@@ -34,7 +34,7 @@ export default function Home() {
 
   const logout = async () => {
     try {
-      await axios.post("/api/logout/", {}, { withCredentials: true });
+      await axios.post("http://127.0.0.1:8000/api/logout/", {}, { withCredentials: true });
       navigate("/auth");
     } catch (err) {
       console.error("Logout failed", err);
@@ -50,7 +50,7 @@ export default function Home() {
       />
       <div className="homeContainer">
         <Sidebar />
-        <Feed />
+        <Feed/>
         <Rightbar />
       </div>
     </>

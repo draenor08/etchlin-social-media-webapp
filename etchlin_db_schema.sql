@@ -104,19 +104,19 @@ CREATE INDEX idx_request ON friends(request);
 CREATE INDEX idx_acceptance ON friends(acceptance);
 
 -- OPTIONAL DUMMY USERS (edit as needed)
-INSERT INTO user (first_name, last_name, email, password, bio)
+INSERT INTO user (first_name, last_name, email, password, bio, profile_picture)
 VALUES 
-('Abi', 'Nana', 'abi@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Just vibing'),
-('Dummy', 'One', 'd1@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 1'),
-('Dummy', 'Two', 'd2@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 2'),
-('Dummy', 'Three', 'd3@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 3'),
-('Dummy', 'Four', 'd4@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 4'),
-('Dummy', 'Five', 'd5@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 5'),
-('Dummy', 'Six', 'd6@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 6'),
-('Dummy', 'Seven', 'd7@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 7'),
-('Dummy', 'Eight', 'd8@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 8'),
-('Dummy', 'Nine', 'd9@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 9');
-
+('Abi', 'Nana', 'abi@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Just vibing', '/media/person/08.jpg'),
+('Dummy', 'One', 'd1@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 1', '/media/person/1.jpeg'),
+('Dummy', 'Two', 'd2@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 2', '/media/person/2.jpeg'),
+('Dummy', 'Three', 'd3@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 3', '/media/person/3.jpeg'),
+('Dummy', 'Four', 'd4@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 4', '/media/person/4.jpeg'),
+('Dummy', 'Five', 'd5@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 5', '/media/person/5.jpeg'),
+('Dummy', 'Six', 'd6@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 6', '/media/person/6.jpeg'),
+('Dummy', 'Seven', 'd7@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 7', '/media/person/7.jpeg'),
+('Dummy', 'Eight', 'd8@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 8', '/media/person/8.jpeg'),
+('Dummy', 'Nine', 'd9@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 9', '/media/person/9.jpeg'),
+('Dummy', 'Ten', 'd10@email.com', '6b6406a2f2f2b8012c08e9c304e0ab6cbe0e2e6e3aa3a7a9f1b6a84c678a4c63$0a1b2c3d4e5f67890123456789abcdef', 'Bio 9', '/media/person/10.jpeg' );
 -- FRIENDSHIPS (Abi follows all)
 INSERT INTO friends (request, acceptance, status)
 VALUES
@@ -127,16 +127,16 @@ VALUES
 -- POSTS (one per dummy user)
 INSERT INTO post (user_id, caption, image_url)
 VALUES 
-(2, 'Sunset hikes are the best.', 'assets/post/1.jpeg'),
-(3, 'Trying out my new camera 📸', 'assets/post/2.jpeg'),
-(4, 'Weekend vibes with coffee.', 'assets/post/3.jpeg'),
-(5, 'Beach day with the squad!', 'assets/post/4.jpeg'),
-(6, 'Morning runs hit different.', 'assets/post/5.jpeg'),
-(7, 'Chilling with my doggo 🐶', 'assets/post/6.jpeg'),
-(8, 'Old books, new memories.', 'assets/post/7.jpeg'),
-(9, 'Cloudy skies, moody mind.', 'assets/post/8.jpeg'),
-(10, 'Candid shot by a friend.', 'assets/post/9.jpeg'),
-(2, 'Nothing like homemade food.', 'assets/post/10.jpeg');
+(2, 'Sunset hikes are the best.', '/media/post/1.jpeg'),
+(3, 'Trying out my new camera 📸', '/media/post/2.jpeg'),
+(4, 'Weekend vibes with coffee.', '/media/post/3.jpeg'),
+(5, 'Beach day with the squad!', '/media/post/4.jpeg'),
+(6, 'Morning runs hit different.', '/media/post/5.jpeg'),
+(7, 'Chilling with my doggo 🐶', '/media/post/6.jpeg'),
+(8, 'Old books, new memories.', '/media/post/7.jpeg'),
+(9, 'Cloudy skies, moody mind.', '/media/post/8.jpeg'),
+(10, 'Candid shot by a friend.', '/media/post/9.jpeg'),
+(2, 'Nothing like homemade food.', '/media/post/10.jpeg');
 
 -- COMMENTS (loop-style)
 INSERT INTO comment (post_id, user_id, content)
