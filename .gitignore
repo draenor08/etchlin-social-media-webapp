@@ -1,37 +1,89 @@
+# Frontend
+
 # Node modules (Frontend)
 frontend/node_modules/
 
 # Build output for React
 frontend/build/
+frontend/.next/
+frontend/.out/
+frontend/dist/
+
+# Public assets
+frontend/public/assets/
+frontend/public/static/
 
 # Environment variables
-*backend/.env
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Backend
+
+# Virtual environment for backend
+venv/
+venv.bak/
+backend/.venv/
+backend/.env
 
 # Django / Backend
-venv/       # Virtual environment for backend
-backend/__pycache__/ # Python bytecode cache
+backend/__pycache__/
 backend/static/
+backend/media/
+
+# Database and migrations
+backend/db.sqlite3
+backend/*.sqlite3
+backend/db/
+
+# Python compiled files
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Logs
+backend/*.log
+backend/logs/
+logs/
+
+# Test artifacts
+coverage/
+.coverage
+*.cover
+*.test-results.xml
+coverage.xml
+reports/
 
 # IDE & OS files
 .DS_Store
 .idea/
 .vscode/
-
-# Logs
-*.log
+*.sublime-project
+*.sublime-workspace
 
 # Docker-related files (if applicable)
 **/docker-compose.yml
 **/Dockerfile
 
-# Python compiled files
-*.pyc
-*.pyo
+# Misc
+*.tmp
+*.bak
+*.orig
+*.merge_file_*
 
-# Coverage and test results
-.coverage
-.tox/
-.nox/
-.hypothesis/
-.pytest_cache/
+# Security and Secrets
+secrets.json
+config.json
 
+# Byte-compiled / optimized / DLL files
+backend/*.py[cod]
+backend/**/*.py[cod]
