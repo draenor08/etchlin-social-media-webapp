@@ -19,10 +19,11 @@ def create_post(request):
 
         image_path = None
         if image_file:
+            # Force images to be saved in the 'post/' subdirectory
             file_ext = os.path.splitext(image_file.name)[-1]
             file_name = f"post_{uuid.uuid4().hex}{file_ext}"
-            image_path = os.path.join('posts', file_name)
-            default_storage.save(image_path, ContentFile(image_file.read()))
+            image_path = os.path.join('post', file_name)
+            default_storage.save(os.path.join('post', file_name), ContentFile(image_file.read()))
 
         try:
             conn = get_db_connection()
@@ -39,6 +40,84 @@ def create_post(request):
             if 'cursor' in locals(): cursor.close()
             if 'conn' in locals(): conn.close()
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+@login_required_json
+def update_post(request):
+    try:
+        if request.method != 'PATCH':
+            return JsonResponse({'error': 'Only PATCH method allowed'}, status=405)
+
+        user_id = request.session.get('user_id')
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        new_caption = data.get('caption')
+
+        if not post_id or not new_caption:
+            return JsonResponse({'error': 'post_id and caption are required'}, status=400)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the user owns the post
+        cursor.execute("SELECT user_id FROM post WHERE post_id = %s", [post_id])
+        post_owner = cursor.fetchone()
+
+        if not post_owner or post_owner[0] != user_id:
+            cursor.close()
+            conn.close()
+            return JsonResponse({'error': 'You are not authorized to edit this post'}, status=403)
+
+        # Update the caption
+        cursor.execute("UPDATE post SET caption = %s WHERE post_id = %s", (new_caption, post_id))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return JsonResponse({'success': 'Post updated successfully'})
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@login_required_json
+def delete_post(request):
+    try:
+        if request.method != 'DELETE':
+            return JsonResponse({'error': 'Only DELETE method allowed'}, status=405)
+
+        user_id = request.session.get('user_id')
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+
+        if not post_id:
+            return JsonResponse({'error': 'post_id is required'}, status=400)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the user owns the post
+        cursor.execute("SELECT user_id FROM post WHERE post_id = %s", [post_id])
+        post_owner = cursor.fetchone()
+
+        if not post_owner or post_owner[0] != user_id:
+            cursor.close()
+            conn.close()
+            return JsonResponse({'error': 'You are not authorized to delete this post'}, status=403)
+
+        # Delete the post
+        cursor.execute("DELETE FROM post WHERE post_id = %s", [post_id])
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return JsonResponse({'success': 'Post deleted successfully'})
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 @login_required_json

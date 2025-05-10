@@ -18,12 +18,12 @@ def like_post(request):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM like WHERE user_id = %s AND post_id = %s", (user_id, post_id))
+            cursor.execute("SELECT * FROM likes WHERE user_id = %s AND post_id = %s", (user_id, post_id))
             if cursor.fetchone():
-                cursor.execute("DELETE FROM like WHERE user_id = %s AND post_id = %s", (user_id, post_id))
+                cursor.execute("DELETE FROM likes WHERE user_id = %s AND post_id = %s", (user_id, post_id))
                 message = 'Unliked'
             else:
-                cursor.execute("INSERT INTO like (user_id, post_id) VALUES (%s, %s)", (user_id, post_id))
+                cursor.execute("INSERT INTO likes (user_id, post_id) VALUES (%s, %s)", (user_id, post_id))
                 message = 'Liked'
             conn.commit()
             return JsonResponse({'message': message})

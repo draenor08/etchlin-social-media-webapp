@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PermMedia } from '@mui/icons-material';
+import axios from 'axios';
 import '../styles/componentStyles/share.css';
 
-function Share() {
+export default function Share({ refreshFeed }) {
     const [postText, setPostText] = useState('');
     const [file, setFile] = useState(null);
     const [filePreview, setFilePreview] = useState(null);
+    const [userData, setUserData] = useState(null);
+
+    // Fetch current user data for profile image
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get("http://localhost:8000/api/auth/user/", {
+                    withCredentials: true,
+                });
+                setUserData(res.data.user);
+            } catch (err) {
+                console.error("Error fetching profile data:", err);
+            }
+        };
+        fetchUser();
+    }, []);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -23,7 +40,7 @@ function Share() {
         }
 
         try {
-            const response = await fetch('/api/posts/create/', {
+            const response = await fetch('http://localhost:8000/api/post/create/', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -33,47 +50,75 @@ function Share() {
                 setPostText('');
                 setFile(null);
                 setFilePreview(null);
-                // Optionally refresh feed
+                refreshFeed(); // Refresh the feed after posting
+                console.log("Post created successfully");
             } else {
-                console.error("Post failed");
+                const errorData = await response.json();
+                console.error("Post failed:", errorData);
             }
         } catch (error) {
             console.error("Error submitting post:", error);
         }
     };
 
+    // Build profile picture URL
+    const profilePicUrl = userData?.profile_picture
+        ? `http://localhost:8000/media/${userData.profile_picture}`
+        : '/assets/default_profile.png';
+
     return (
         <div className="share">
             <div className="shareWrapper">
                 <div className="shareTop">
-                    <img src="profile_picture" alt="" className="shareProfileImg" />
-                    <input 
-                        placeholder="What's on your mind?" 
-                        className="shareInput" 
+                    {userData && (
+                        <img 
+                            src={profilePicUrl} 
+                            alt="Profile" 
+                            className="shareProfileImg" 
+                        />
+                    )}
+                    <input
+                        type="text"
+                        placeholder="What's on your mind?"
                         value={postText}
                         onChange={(e) => setPostText(e.target.value)}
+                        className="shareInput"
                     />
                 </div>
+
                 <hr className="shareHr" />
+
                 <div className="shareBottom">
                     <div className="shareOptions">
                         <label className="shareOption">
-                            <PermMedia htmlColor="tomato" className="shareIcon" />
+                            <PermMedia className="shareIcon" />
                             <span className="shareOptionText">Photo</span>
                             <input 
                                 type="file" 
-                                className="shareOptionInput" 
+                                className="shareFileInput" 
                                 onChange={handleFileChange} 
-                                style={{ display: 'none' }}
+                                style={{ display: 'none' }} 
                             />
                         </label>
                     </div>
                     <button className="shareButton" onClick={handleSubmit}>Post</button>
                 </div>
-                {filePreview && <img src={filePreview} alt="preview" className="shareImg" />}
+
+                {filePreview && (
+                    <div className="sharePreviewWrapper">
+                        <img src={filePreview} alt="Preview" className="shareImg" />
+                        <button
+                            className="sharePreviewRemove"
+                            onClick={() => {
+                                setFile(null);
+                                setFilePreview(null);
+                            }}
+                        >
+                            ✖
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
-
-export default Share;
