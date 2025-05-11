@@ -6,4 +6,5 @@ urlpatterns = [
     path('post/feed/', views.user_feed, name='user_feed'),
     path('post/edit/', views.update_post, name='post_edit'),
     path('post/delete/', views.delete_post, name='post_delete'),
+    path('posts/user/<str:user_id>/', views.user_posts, name='user_posts'),
 ]

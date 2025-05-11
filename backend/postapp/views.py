@@ -209,3 +209,34 @@ def user_feed(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+@login_required_json
+def user_posts(request, user_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Fetch posts for the given user
+        cursor.execute("""
+            SELECT post_id, caption, image_url, timestamp
+            FROM post
+            WHERE user_id = %s
+            ORDER BY timestamp DESC
+        """, (user_id,))
+        posts = cursor.fetchall()
+
+        # Format the image URLs
+        for post in posts:
+            if post["image_url"]:
+                post["image_url"] = f"/media/{post['image_url']}"
+
+        return JsonResponse({'posts': posts}, status=200)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()

@@ -1,50 +1,177 @@
-.profile{
+:root {
+    --primary-color: #002244;
+    --accent-color: #f5deb3;
+    --background-color: #f9f9f9;
+    --text-color: #333;
+    --secondary-text-color: #666;
+    --hover-bg-color: #f0e6d6;
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.profile-header {
     display: flex;
-}
-
-.profileRight{
-    flex: 9;
-}
-
-.profileCover{
-    height: 320px;
-    position: relative;
-}
-
-.profileCoverImg{
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-}
-
-.profileUserImg{
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: auto;
-    top: 150px;
-    border: 3px solid white;
-}
-
-.profileInfo{
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    margin-bottom: 20px;
 }
 
-.profileInfoName{
-    font-size: 24px;
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-right: 20px;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
 }
 
-.profileInfoDesc{
-    font-weight: 300;
+.profile-details {
+    flex-grow: 1;
 }
 
-.profileRightBottom{
-    display: flex;
+.profile-details h2 {
+    margin: 0;
+    font-size: 28px;
+    color: var(--primary-color);
+}
+
+.profile-details p {
+    margin: 5px 0;
+    color: var(--secondary-text-color);
+}
+
+.profile-options {
+    position: relative;
+    cursor: pointer;
+}
+
+.options-menu {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: var(--accent-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.options-menu span,
+.options-menu label {
+    display: block;
+    padding: 10px 15px;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+.options-menu span:hover,
+.options-menu label:hover {
+    background-color: var(--hover-bg-color);
+}
+
+.edit-bio-container {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.edit-bio-container textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.edit-bio-container button {
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: var(--primary-color);
+    color: #fff;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+
+.edit-bio-container button:nth-child(2) {
+    background-color: #ccc;
+}
+
+.user-posts {
+    margin-top: 20px;
+}
+
+.user-posts h3 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.post-item {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.post-item img {
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    border-radius: 10px 10px 0 0;
+    object-fit: cover;
+    height: 200px;
+}
+
+.post-item p {
+    padding: 10px;
+    color: var(--text-color);
+}
+
+.friend-button {
+    margin: 10px 0;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.friend-button:hover {
+    background-color: #001122;
+}
+
+.saveBtn {
+  background-color: #1d3557;
+  color: #f5f5dc;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  transition: background-color 0.2s ease;
+}
+
+.optionText {
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

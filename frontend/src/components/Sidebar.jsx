@@ -10,7 +10,7 @@ import {
   MessageRounded,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
   const [friends, setFriends] = useState([]);
@@ -69,15 +69,15 @@ export default function Sidebar() {
         <ul className="sidebarFriendList">
           {friends.map(friend => (
             <li key={friend.user_id} className="sidebarFriendItem">
-              <div className="friendDetails" onClick={() => navigate(`/messages/${friend.user_id}`)}>
+              <div className="friendDetails">
                 <img
                   src={`http://localhost:8000/media/${friend.profile_picture}`}
                   alt={"/assets/default-profile.png"}
                   className="sidebarFriendImg"
                 />
-                <span className="sidebarFriendName">
+                <Link to={`/profile/${friend.user_id}`} className="sidebarFriendName">
                   {friend.first_name} {friend.last_name}
-                </span>
+                </Link>
               </div>
               <MessageRounded
                 className="messageIcon"

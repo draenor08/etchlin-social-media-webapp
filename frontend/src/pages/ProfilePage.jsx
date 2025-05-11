@@ -1,32 +1,57 @@
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import Profile from '../components/Profile';
 
 const ProfilePage = () => {
-  const { id } = useParams();
-  const [user, setUser] = useState({});
-  const [posts, setPosts] = useState([]);
+    const { id } = useParams();
+    const [profileData, setProfileData] = useState(null);
+    const [isCurrentUser, setIsCurrentUser] = useState(false);
+    const [userPosts, setUserPosts] = useState([]);
 
-  useEffect(() => {
-    axios.get(`http://localhost:8000/api/profile/${id}/`, { withCredentials: true }).then(res => {
-      setUser(res.data.user);
-      setPosts(res.data.posts);
-    });
-  }, [id]);
+    const fetchProfileData = useCallback(async () => {
+        try {
+            // Fetch profile data
+            const res = await fetch(`http://localhost:8000/api/profile/${id}/`, {
+                credentials: 'include',
+            });
+            const profileData = await res.json();
+            setProfileData(profileData.user);
 
-  return (
-    <div>
-      <ProfileComponent user={user} />
-      <div className="post-list">
-        {posts.map(post => (
-          <div key={post.post_id}>
-            <img src={`http://localhost:8000/media/${post.image}`} />
-            <p>{post.text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+            const authRes = await fetch('http://localhost:8000/api/auth/user/', {
+                credentials: 'include',
+            });
+            if (authRes.ok) {
+                const authData = await authRes.json();
+                if (authData.user && authData.user.user_id) {
+                    setIsCurrentUser(String(authData.user.user_id) === id);
+                }
+            }
+
+            // Fetch user's posts
+            const postsRes = await fetch(`http://localhost:8000/api/posts/user/${id}/`, {
+                credentials: 'include',
+            });
+            const postsData = await postsRes.json();
+            setUserPosts(postsData.posts || []);
+        } catch (error) {
+            console.error('Error fetching profile data:', error);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        fetchProfileData();
+    }, [fetchProfileData]);
+
+    return profileData ? (
+        <Profile 
+            profileData={profileData} 
+            isCurrentUser={isCurrentUser} 
+            userPosts={userPosts} 
+            refreshProfile={fetchProfileData} 
+        />
+    ) : (
+        <p>Loading profile...</p>
+    );
 };
 
 export default ProfilePage;

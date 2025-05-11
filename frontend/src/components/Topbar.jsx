@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BellIcon, User } from 'lucide-react';
 import '../styles/componentStyles/topbar.css';
+import SearchBar from './SearchBar';
 
 const Topbar = ({ userId, userProfilePic, handleNotifClick, logout }) => {
   return (
@@ -10,13 +11,13 @@ const Topbar = ({ userId, userProfilePic, handleNotifClick, logout }) => {
         <Link to="/" className="logo">Etchlin</Link>
       </div>
       <div className="topbar-center">
-        <input type="text" placeholder="Search..." className="search-input" />
+        <SearchBar/>
       </div>
       <div className="topbar-right">
         <button className="icon-button" onClick={handleNotifClick}>
           <BellIcon size={20} />
         </button>
-        <Link to={`api/profile/${userId}`} className="profile-link">
+        <Link to={`profile/${userId}`} className="profile-link">
           <User className="profile-pic" />
         </Link>
         <button className="logout-button" onClick={logout}>Logout</button>
