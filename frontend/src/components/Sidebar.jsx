@@ -31,6 +31,10 @@ export default function Sidebar() {
     fetchFriends();
   }, []);
 
+  const handleOpenChat = (friendId) => {
+    navigate(`/messages/${friendId}`);
+  };
+  
   return (
     <div className="sidebar">
       <div className="sidebarWrapper">
@@ -79,10 +83,10 @@ export default function Sidebar() {
                   {friend.first_name} {friend.last_name}
                 </Link>
               </div>
-              <MessageRounded
-                className="messageIcon"
-                onClick={() => navigate(`/messages/${friend.user_id}`)}
-              />
+                <MessageRounded
+                  className="messageIcon"
+                  onClick={() => handleOpenChat(friend.user_id)}
+                />
             </li>
           ))}
         </ul>

@@ -85,39 +85,59 @@ def update_post(request):
 @login_required_json
 def delete_post(request):
     try:
+        # Validate method
         if request.method != 'DELETE':
             return JsonResponse({'error': 'Only DELETE method allowed'}, status=405)
 
+        # Validate user session
         user_id = request.session.get('user_id')
-        data = json.loads(request.body)
-        post_id = data.get('post_id')
+        if not user_id:
+            return JsonResponse({'error': 'User not authenticated'}, status=401)
+
+        # Validate post_id in request body
+        try:
+            data = json.loads(request.body)
+            post_id = data.get('post_id')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
         if not post_id:
             return JsonResponse({'error': 'post_id is required'}, status=400)
 
+        # Database connection
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the user owns the post
+        # Check if the post exists and is owned by the user
         cursor.execute("SELECT user_id FROM post WHERE post_id = %s", [post_id])
         post_owner = cursor.fetchone()
 
-        if not post_owner or post_owner[0] != user_id:
-            cursor.close()
-            conn.close()
+        if not post_owner:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+
+        if post_owner[0] != user_id:
             return JsonResponse({'error': 'You are not authorized to delete this post'}, status=403)
 
-        # Delete the post
+        # Delete related likes
+        cursor.execute("DELETE FROM likes WHERE post_id = %s", [post_id])
+
+        # Delete related comments
+        cursor.execute("DELETE FROM comment WHERE post_id = %s", [post_id])
+
+        # Finally, delete the post
         cursor.execute("DELETE FROM post WHERE post_id = %s", [post_id])
         conn.commit()
-
-        cursor.close()
-        conn.close()
 
         return JsonResponse({'success': 'Post deleted successfully'})
 
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        print(f"Error in delete_post: {e}")
+        return JsonResponse({'error': 'Server error'}, status=500)
+
+    finally:
+        if 'cursor' in locals(): cursor.close()
+        if 'conn' in locals(): conn.close()
+
 
 @csrf_exempt
 @login_required_json

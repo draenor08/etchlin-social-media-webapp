@@ -55,10 +55,11 @@ function Post({ post, onLike, onComment, currentUserId, refreshFeed }) {
             }
         }
     };
+    
+    const profilePicUrl = post.profilePicture
+    ? `http://localhost:8000${post.profilePicture}`
+    : post.profilePicture;
 
-    const profilePicUrl = post.profilePicture.startsWith('/assets')
-        ? post.profilePicture
-        : `http://localhost:8000${post.profilePicture}`;
     const postImageUrl = post.image ? `http://localhost:8000${post.image}` : '';
 
     return (

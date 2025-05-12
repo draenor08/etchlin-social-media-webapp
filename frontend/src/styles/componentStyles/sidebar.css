@@ -102,3 +102,14 @@
   font-weight: 500;
   color: #fff;
 }
+
+/* sidebar.css */
+.messageIcon {
+    cursor: pointer;
+    color: #555;
+    transition: color 0.2s;
+}
+
+.messageIcon:hover {
+    color: #007bff;
+}

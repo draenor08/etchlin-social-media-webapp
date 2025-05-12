@@ -43,21 +43,27 @@ const Profile = ({ profileData, isCurrentUser, refreshProfile, userPosts }) => {
 
     const handleFriendAction = async () => {
         try {
-            const endpoint = 
-                friendStatus === 'pending' ? 'friend/remove' :
-                friendStatus === 'accepted' ? 'friend/remove' :
-                `${profileData.user_id}/send_request`;
+            const endpoint = friendStatus === 'pending' || friendStatus === 'accepted'
+                ? 'friend/remove'
+                : `send_request`;
+
+            const body = friendStatus === 'pending' || friendStatus === 'accepted'
+                ? JSON.stringify({ receiver_id: profileData.user_id })
+                : JSON.stringify({ receiver_id: profileData.user_id });
 
             const res = await fetch(`http://localhost:8000/api/${endpoint}/`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ receiver_id: profileData.user_id })
+                body: body
             });
             
             if (res.ok) {
                 fetchFriendStatus();
                 fetchFriendCount();
+            } else {
+                const errorData = await res.json();
+                console.error('Error handling friend action:', errorData);
             }
         } catch (error) {
             console.error('Error handling friend action:', error);

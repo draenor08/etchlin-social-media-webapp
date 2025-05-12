@@ -4,27 +4,41 @@ from django.http import JsonResponse
 import json
 from utils.auth import login_required_json
 from utils.db import get_db_connection
+
 @csrf_exempt
+@login_required_json
 def send_request(request):
     if request.method == 'POST':
         sender_id = request.session.get('user_id')
         if not sender_id:
             return JsonResponse({'error': 'Not logged in'}, status=401)
 
-        data = json.loads(request.body)
-        receiver_id = data.get('receiver_id')
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("INSERT INTO friends (request, acceptance, status) VALUES (%s, %s, 'pending')", (sender_id, receiver_id))
+            data = json.loads(request.body)
+            receiver_id = data.get('receiver_id')
+            if not receiver_id:
+                return JsonResponse({'error': 'Receiver ID required'}, status=400)
+
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Insert friend request
+            cursor.execute("""
+                INSERT INTO friends (request, acceptance, status) 
+                VALUES (%s, %s, 'pending')
+            """, (sender_id, receiver_id))
             conn.commit()
-            return JsonResponse({'message': 'Friend request sent'})
+
+            return JsonResponse({'message': 'Friend request sent'}, status=201)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+            print("Error in send_request:", e)
+            return JsonResponse({'error': 'Database error'}, status=500)
         finally:
             cursor.close()
             conn.close()
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 @csrf_exempt
 def respond_request(request):
@@ -76,16 +90,17 @@ def get_friends(request):
 
     return JsonResponse({'friends': friends})
 
-@csrf_exempt
+@csrf_exempt 
 @login_required_json
 def remove_friend(request):
     if request.method == 'POST':
         user_id = request.session.get('user_id')
         data = json.loads(request.body)
-        friend_id = data.get('friend_id')
+        receiver_id = data.get('receiver_id')
 
-        if not friend_id or friend_id == user_id:
-            return JsonResponse({'error': 'Invalid friend ID'}, status=400)
+        # Validate the receiver ID
+        if not receiver_id or receiver_id == user_id:
+            return JsonResponse({'error': 'Invalid receiver ID'}, status=400)
 
         try:
             conn = get_db_connection()
@@ -96,17 +111,19 @@ def remove_friend(request):
                 DELETE FROM friends 
                 WHERE (request = %s AND acceptance = %s) 
                 OR (request = %s AND acceptance = %s)
-            """, (user_id, friend_id, friend_id, user_id))
+            """, (user_id, receiver_id, receiver_id, user_id))
             conn.commit()
 
             return JsonResponse({'message': 'Friend removed successfully'})
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            print(f"Error in remove_friend: {e}")
+            return JsonResponse({'error': 'Server error'}, status=500)
         finally:
             cursor.close()
             conn.close()
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 @csrf_exempt
 @login_required_json
