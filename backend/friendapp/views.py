@@ -61,6 +61,29 @@ def respond_request(request):
         conn.close()
 
         return JsonResponse({'message': f'Request {status}'})
+    
+@csrf_exempt
+@login_required_json
+def get_requests(request):
+    try:
+        user_id = request.session.get('user_id')
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT u.user_id, u.first_name, u.last_name, u.profile_picture
+            FROM friends f
+            JOIN user u ON f.request = u.user_id
+            WHERE f.acceptance = %s AND f.status = 'pending'
+        """, (user_id,))
+        requests = cursor.fetchall()
+    except Exception as e:
+        print("Database error in get_requests:", e)
+        return JsonResponse({'error': 'Database error'}, status=500)
+    finally:
+        cursor.close()
+        conn.close()
+
+    return JsonResponse({'requests': requests})
 
 @login_required_json
 def get_friends(request):

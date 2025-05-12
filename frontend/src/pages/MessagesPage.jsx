@@ -61,8 +61,12 @@ const MessagesPage = () => {
                 body: JSON.stringify({ receiver_id: friendId, text }),
             });
             if (res.ok) {
-                const newMessage = await res.json();
-                setMessages((prevMessages) => [...prevMessages, newMessage]);
+                // Refresh the message list to include the newly sent message
+                const updatedRes = await fetch(`http://localhost:8000/api/messages/${friendId}/`, {
+                    credentials: 'include',
+                });
+                const updatedData = await updatedRes.json();
+                setMessages(updatedData.messages || []);
             }
         } catch (error) {
             console.error('Error sending message:', error);

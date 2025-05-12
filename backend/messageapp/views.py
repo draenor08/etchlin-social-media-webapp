@@ -59,7 +59,8 @@ def get_conversation(request, other_user_id):
 
         # Format timestamps for easier reading on the frontend
         for message in messages:
-            message['timestamp'] = message['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
+            if isinstance(message['timestamp'], datetime):
+                message['timestamp'] = message['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
 
     except Exception as e:
         print("Database error in get_conversation:", e)

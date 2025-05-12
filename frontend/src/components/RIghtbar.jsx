@@ -1,105 +1,107 @@
+// src/components/Rightbar.js
+import React, { useEffect, useState } from 'react';
 import "../styles/componentStyles/rightbar.css";
-import { Users } from "../dummyData";
-import Online from "./Online";
+import { Link } from "react-router-dom";
 
 export default function Rightbar({ profile }) {
-  const HomeRightbar = () => {
-    return (
-      <>
-        <div className="birthdayContainer">
-          <img className="birthdayImg" src="assets/gift.png" alt="" />
-          <span className="birthdayText">
-            <b>Pola Foster</b> and <b>3 other friends</b> have a birhday today.
-          </span>
-        </div>
-        <img className="rightbarAd" src="assets/ad.png" alt="" />
-        <h4 className="rightbarTitle">Online Friends</h4>
-        <ul className="rightbarFriendList">
-          {Users.map((u) => (
-            <Online key={u.id} user={u} />
-          ))}
-        </ul>
-      </>
-    );
-  };
+    const [requests, setRequests] = useState([]);
+    const [friends, setFriends] = useState([]);
 
-  const ProfileRightbar = () => {
+    // Fetch friend requests
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                const res = await fetch("http://localhost:8000/api/friends/requests/", {
+                    credentials: "include",
+                });
+                const data = await res.json();
+                setRequests(data.requests || []);
+            } catch (error) {
+                console.error("Failed to fetch friend requests:", error);
+            }
+        };
+
+        // Fetch accepted friends
+        const fetchFriends = async () => {
+            try {
+                const res = await fetch("http://localhost:8000/api/friends/", {
+                    credentials: "include",
+                });
+                const data = await res.json();
+                setFriends(data.friends || []);
+            } catch (error) {
+                console.error("Failed to fetch friends:", error);
+            }
+        };
+
+        fetchRequests();
+        fetchFriends();
+    }, []);
+
+    const handleRequestResponse = async (requesterId, action) => {
+        try {
+            const res = await fetch(`http://localhost:8000/api/${requesterId}/respond/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requester_id: requesterId, action }),
+            });
+            if (res.ok) {
+                // Remove the processed request from the list
+                setRequests(requests.filter(req => req.user_id !== requesterId));
+            }
+        } catch (error) {
+            console.error("Error responding to friend request:", error);
+        }
+    };
+
     return (
-      <>
-        <h4 className="rightbarTitle">User information</h4>
-        <div className="rightbarInfo">
-          <div className="rightbarInfoItem">
-            <span className="rightbarInfoKey">City:</span>
-            <span className="rightbarInfoValue">New York</span>
-          </div>
-          <div className="rightbarInfoItem">
-            <span className="rightbarInfoKey">From:</span>
-            <span className="rightbarInfoValue">Madrid</span>
-          </div>
-          <div className="rightbarInfoItem">
-            <span className="rightbarInfoKey">Relationship:</span>
-            <span className="rightbarInfoValue">Single</span>
-          </div>
+        <div className="rightbar">
+            <div className="rightbarWrapper">
+                <h2 className="rightbarMainTitle">Notifications</h2>
+
+                {/* Friend Requests */}
+                <h4 className="rightbarSectionTitle">Friend Requests</h4>
+                <ul className="rightbarFriendList">
+                    {requests.length > 0 ? (
+                        requests.map((req) => (
+                            <li key={req.user_id} className="requestItem">
+                                <img
+                                    src={`http://localhost:8000/media/${req.profile_picture}`}
+                                    alt="Profile"
+                                    className="requestImg"
+                                />
+                                <span className="requestName">
+                                    {req.first_name} {req.last_name}
+                                </span>
+                                <div className="requestActions">
+                                    <button onClick={() => handleRequestResponse(req.user_id, 'accept')} className="acceptBtn">Accept</button>
+                                    <button onClick={() => handleRequestResponse(req.user_id, 'reject')} className="rejectBtn">Reject</button>
+                                </div>
+                            </li>
+                        ))
+                    ) : (
+                        <p className="noRequests">No pending requests</p>
+                    )}
+                </ul>
+
+                {/* Friends List */}
+                <h4 className="rightbarSectionTitle">Your Friends</h4>
+                <ul className="rightbarFriendList">
+                    {friends.map(friend => (
+                        <li key={friend.user_id} className="rightbarFriendItem">
+                            <img
+                                src={`http://localhost:8000/media/${friend.profile_picture}`}
+                                alt="Profile"
+                                className="rightbarFriendImg"
+                            />
+                            <Link to={`/profile/${friend.user_id}`} className="rightbarFriendName">
+                                {friend.first_name} {friend.last_name}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
-        <h4 className="rightbarTitle">User friends</h4>
-        <div className="rightbarFollowings">
-          <div className="rightbarFollowing">
-            <img
-              src="assets/person/1.jpeg"
-              alt=""
-              className="rightbarFollowingImg"
-            />
-            <span className="rightbarFollowingName">John Carter</span>
-          </div>
-          <div className="rightbarFollowing">
-            <img
-              src="assets/person/2.jpeg"
-              alt=""
-              className="rightbarFollowingImg"
-            />
-            <span className="rightbarFollowingName">John Carter</span>
-          </div>
-          <div className="rightbarFollowing">
-            <img
-              src="assets/person/3.jpeg"
-              alt=""
-              className="rightbarFollowingImg"
-            />
-            <span className="rightbarFollowingName">John Carter</span>
-          </div>
-          <div className="rightbarFollowing">
-            <img
-              src="assets/person/4.jpeg"
-              alt=""
-              className="rightbarFollowingImg"
-            />
-            <span className="rightbarFollowingName">John Carter</span>
-          </div>
-          <div className="rightbarFollowing">
-            <img
-              src="assets/person/5.jpeg"
-              alt=""
-              className="rightbarFollowingImg"
-            />
-            <span className="rightbarFollowingName">John Carter</span>
-          </div>
-          <div className="rightbarFollowing">
-            <img
-              src="assets/person/6.jpeg"
-              alt=""
-              className="rightbarFollowingImg"
-            />
-            <span className="rightbarFollowingName">John Carter</span>
-          </div>
-        </div>
-      </>
     );
-  };
-  return (
-    <div className="rightbar">
-      <div className="rightbarWrapper">
-        {profile ? <ProfileRightbar /> : <HomeRightbar />}
-      </div>
-    </div>
-  );
 }
