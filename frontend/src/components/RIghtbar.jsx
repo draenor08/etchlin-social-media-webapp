@@ -7,7 +7,6 @@ export default function Rightbar({ profile }) {
     const [requests, setRequests] = useState([]);
     const [friends, setFriends] = useState([]);
 
-    // Fetch friend requests
     useEffect(() => {
         const fetchRequests = async () => {
             try {
@@ -21,7 +20,6 @@ export default function Rightbar({ profile }) {
             }
         };
 
-        // Fetch accepted friends
         const fetchFriends = async () => {
             try {
                 const res = await fetch("http://localhost:8000/api/friends/", {
@@ -47,7 +45,6 @@ export default function Rightbar({ profile }) {
                 body: JSON.stringify({ requester_id: requesterId, action }),
             });
             if (res.ok) {
-                // Remove the processed request from the list
                 setRequests(requests.filter(req => req.user_id !== requesterId));
             }
         } catch (error) {
@@ -60,7 +57,6 @@ export default function Rightbar({ profile }) {
             <div className="rightbarWrapper">
                 <h2 className="rightbarMainTitle">Notifications</h2>
 
-                {/* Friend Requests */}
                 <h4 className="rightbarSectionTitle">Friend Requests</h4>
                 <ul className="rightbarFriendList">
                     {requests.length > 0 ? (
@@ -85,7 +81,6 @@ export default function Rightbar({ profile }) {
                     )}
                 </ul>
 
-                {/* Friends List */}
                 <h4 className="rightbarSectionTitle">Your Friends</h4>
                 <ul className="rightbarFriendList">
                     {friends.map(friend => (

@@ -1,15 +1,13 @@
-/* share.css */
-
 .share {
   width: 100%;
   max-width: 600px;
-  background-color: #fdfcf7; /* soft beige background */
+  background-color: #fdfcf7;
   border-radius: 20px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   margin: 20px auto;
   padding: 24px;
   font-family: 'Georgia', serif;
-  color: #1d3557; /* rich navy */
+  color: #1d3557;
 }
 
 .shareWrapper {
@@ -73,7 +71,7 @@
 
 .shareIcon {
   margin-right: 6px;
-  color: #8b5e3c; /* muted bronze/gold tone */
+  color: #8b5e3c;
 }
 
 .shareButton {

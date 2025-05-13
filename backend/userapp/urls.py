@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views  # this imports from userapp/views.py
+from . import views
 
 urlpatterns = [
     path('auth/check/', views.check_auth, name='check_auth'),

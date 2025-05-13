@@ -1,4 +1,4 @@
-/* Main Rightbar Container */
+
 .rightbar {
     width: 300px;
     background-color: #f8f6ef;
@@ -7,7 +7,6 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Main Title */
 .rightbarMainTitle {
     font-size: 2rem;
     color: #2b3a55;
@@ -17,7 +16,7 @@
     padding-bottom: 5px;
 }
 
-/* Section Titles */
+
 .rightbarSectionTitle {
     font-size: 1.5rem;
     color: #2b3a55;
@@ -26,7 +25,7 @@
     margin-bottom: 10px;
 }
 
-/* Friend and Request Lists */
+
 .rightbarFriendList {
     list-style: none;
     padding: 0;

@@ -9,7 +9,6 @@ export default function Share({ refreshFeed }) {
     const [filePreview, setFilePreview] = useState(null);
     const [userData, setUserData] = useState(null);
 
-    // Fetch current user data for profile image
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -50,7 +49,7 @@ export default function Share({ refreshFeed }) {
                 setPostText('');
                 setFile(null);
                 setFilePreview(null);
-                refreshFeed(); // Refresh the feed after posting
+                refreshFeed();
                 console.log("Post created successfully");
             } else {
                 const errorData = await response.json();
@@ -61,7 +60,6 @@ export default function Share({ refreshFeed }) {
         }
     };
 
-    // Build profile picture URL
     const profilePicUrl = userData?.profile_picture
         ? `http://localhost:8000/media/${userData.profile_picture}`
         : '/assets/default_profile.png';

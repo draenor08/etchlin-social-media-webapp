@@ -57,7 +57,6 @@ def get_conversation(request, other_user_id):
         """, (user_id, other_user_id, other_user_id, user_id))
         messages = cursor.fetchall()
 
-        # Format timestamps for easier reading on the frontend
         for message in messages:
             if isinstance(message['timestamp'], datetime):
                 message['timestamp'] = message['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')

@@ -56,7 +56,6 @@ export default function Feed() {
       });
   }, []);
 
-  // Fetch posts on initial load
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);

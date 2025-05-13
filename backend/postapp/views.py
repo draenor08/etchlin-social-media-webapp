@@ -8,7 +8,6 @@ import os, uuid, json
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
-# CREATE POST (TEXT/IMAGE)
 @csrf_exempt
 @login_required_json
 def create_post(request):
@@ -19,7 +18,6 @@ def create_post(request):
 
         image_path = None
         if image_file:
-            # Force images to be saved in the 'post/' subdirectory
             file_ext = os.path.splitext(image_file.name)[-1]
             file_name = f"post_{uuid.uuid4().hex}{file_ext}"
             image_path = os.path.join('post', file_name)
@@ -59,7 +57,6 @@ def update_post(request):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the user owns the post
         cursor.execute("SELECT user_id FROM post WHERE post_id = %s", [post_id])
         post_owner = cursor.fetchone()
 
@@ -68,7 +65,6 @@ def update_post(request):
             conn.close()
             return JsonResponse({'error': 'You are not authorized to edit this post'}, status=403)
 
-        # Update the caption
         cursor.execute("UPDATE post SET caption = %s WHERE post_id = %s", (new_caption, post_id))
         conn.commit()
 
@@ -85,16 +81,13 @@ def update_post(request):
 @login_required_json
 def delete_post(request):
     try:
-        # Validate method
         if request.method != 'DELETE':
             return JsonResponse({'error': 'Only DELETE method allowed'}, status=405)
 
-        # Validate user session
         user_id = request.session.get('user_id')
         if not user_id:
             return JsonResponse({'error': 'User not authenticated'}, status=401)
 
-        # Validate post_id in request body
         try:
             data = json.loads(request.body)
             post_id = data.get('post_id')
@@ -104,11 +97,9 @@ def delete_post(request):
         if not post_id:
             return JsonResponse({'error': 'post_id is required'}, status=400)
 
-        # Database connection
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the post exists and is owned by the user
         cursor.execute("SELECT user_id FROM post WHERE post_id = %s", [post_id])
         post_owner = cursor.fetchone()
 
@@ -118,13 +109,10 @@ def delete_post(request):
         if post_owner[0] != user_id:
             return JsonResponse({'error': 'You are not authorized to delete this post'}, status=403)
 
-        # Delete related likes
         cursor.execute("DELETE FROM likes WHERE post_id = %s", [post_id])
 
-        # Delete related comments
         cursor.execute("DELETE FROM comment WHERE post_id = %s", [post_id])
 
-        # Finally, delete the post
         cursor.execute("DELETE FROM post WHERE post_id = %s", [post_id])
         conn.commit()
 
@@ -155,7 +143,6 @@ def user_feed(request):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Fetch posts from friends and self
         cursor.execute(""" 
             SELECT 
                 p.post_id, p.user_id, p.caption, p.image_url, p.timestamp,
@@ -178,15 +165,12 @@ def user_feed(request):
         for post in posts:
             post_id, author_id, caption, image_url, timestamp, first_name, profile_picture = post
 
-            # Get comment count
             cursor.execute("SELECT COUNT(*) FROM comment WHERE post_id = %s", [post_id])
             comment_count = cursor.fetchone()[0]
 
-            # Get like count
             cursor.execute("SELECT COUNT(*) FROM likes WHERE post_id = %s", [post_id])
             like_count = cursor.fetchone()[0]
 
-            # Get comments
             cursor.execute("""
                 SELECT c.comment_id, c.user_id, u.first_name, u.profile_picture, c.content, c.timestamp
                 FROM comment c
@@ -208,7 +192,6 @@ def user_feed(request):
                 for c in comments_raw
             ]
 
-            # Add the post to the feed
             feed.append({
                 'post_id': post_id,
                 'user_id': author_id,
@@ -237,7 +220,6 @@ def user_posts(request, user_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Fetch posts for the given user
         cursor.execute("""
             SELECT post_id, caption, image_url, timestamp
             FROM post
@@ -246,7 +228,6 @@ def user_posts(request, user_id):
         """, (user_id,))
         posts = cursor.fetchall()
 
-        # Format the image URLs
         for post in posts:
             if post["image_url"]:
                 post["image_url"] = f"/media/{post['image_url']}"

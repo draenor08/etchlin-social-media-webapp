@@ -1,14 +1,13 @@
-/* sidebar.css */
 .sidebar {
   flex: 3;
   height: calc(100vh - 50px);
   overflow-y: scroll;
   position: sticky;
   top: 50px;
-  background-color: #1d3557;  /* Dark Navy Blue background */
-  color: #f1faee;  /* Light Beige text color */
-  border-right: 1px solid #f1faee;  /* Soft border to separate sidebar */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Soft shadow for depth */
+  background-color: #1d3557;
+  color: #f1faee;
+  border-right: 1px solid #f1faee;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 ::-webkit-scrollbar {
@@ -16,11 +15,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #e0fbfc;  /* Light cyan background for scroll track */
+  background-color: #e0fbfc;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #f1faee;  /* Light beige scrollbar thumb */
+  background-color: #f1faee;
   border-radius: 5px;
 }
 
@@ -38,13 +37,13 @@
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  transition: background-color 0.3s ease;  /* Smooth transition on hover */
-  border-radius: 8px;  /* Rounded corners for list items */
+  transition: background-color 0.3s ease;
+  border-radius: 8px;
 }
 
 .sidebarListItem:hover {
-  background-color: #f1faee;  /* Beige hover effect */
-  color: #1d3557;  /* Dark text on hover */
+  background-color: #f1faee;
+  color: #1d3557;
 }
 
 .sidebarIcon {
@@ -56,24 +55,24 @@
   width: 150px;
   border: none;
   padding: 12px;
-  border-radius: 25px;  /* Round button for a modern look */
+  border-radius: 25px;
   font-weight: 500;
-  background-color: #e0fbfc;  /* Light cyan button background */
-  color: #1d3557;  /* Dark navy blue text */
+  background-color: #e0fbfc;
+  color: #1d3557;
   cursor: pointer;
-  transition: background-color 0.3s ease;  /* Smooth hover effect */
+  transition: background-color 0.3s ease;
 }
 
 .sidebarButton:hover {
-  background-color: #f1faee;  /* Beige background on hover */
-  color: #1d3557;  /* Keep the text color same for consistency */
+  background-color: #f1faee;
+  color: #1d3557;
 }
 
 .sidebarHr {
   margin: 20px 0;
   border: 0;
   height: 1px;
-  background-color: #f1faee;  /* Light beige horizontal line */
+  background-color: #f1faee;
 }
 
 .sidebarFriendList {
@@ -82,7 +81,6 @@
   list-style: none;
 }
 
-/* Optional: Style for individual friends in friend list */
 .sidebarFriend {
   display: flex;
   align-items: center;

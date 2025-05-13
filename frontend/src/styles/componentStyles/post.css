@@ -1,7 +1,7 @@
 .post {
   width: 100%;
   max-width: 600px;
-  background-color: #fdfaf5; /* subtle beige */
+  background-color: #fdfaf5;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   margin: 24px 0;
@@ -201,12 +201,10 @@
     border-radius: 4px;
 }
 
-/* Close dropdown on blur */
 .postOptions:focus-within {
     outline: none;
 }
 
-/* Styles for the edit container */
 .editContainer {
     margin-top: 15px;
     background-color: #fdfaf5;
@@ -216,7 +214,6 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
-/* Textarea styling */
 .editTextarea {
     width: 100%;
     min-height: 80px;
@@ -237,13 +234,11 @@
     border-color: #1d3557;
 }
 
-/* Buttons container */
 .editButtons {
     display: flex;
     gap: 10px;
 }
 
-/* Save button */
 .editSubmitBtn {
     background-color: #1d3557;
     color: #fff;
@@ -260,7 +255,6 @@
     transform: scale(1.02);
 }
 
-/* Cancel button */
 .editCancelBtn {
     background-color: #f0ebe1;
     color: #1d3557;

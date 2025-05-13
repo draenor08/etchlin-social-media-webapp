@@ -11,7 +11,7 @@ const PrivateRoute = ({ children }) => {
       .catch(() => setIsAuthenticated(false));
   }, []);
 
-  if (isAuthenticated === null) return null; // or loader
+  if (isAuthenticated === null) return null;
   return isAuthenticated ? children : <Navigate to="/auth" />;
 };
 

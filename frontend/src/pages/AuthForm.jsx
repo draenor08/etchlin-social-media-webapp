@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import '../styles/pageStyles/authForm.css'; // Your external CSS file
-import 'boxicons/css/boxicons.min.css'; // Boxicons CDN via npm or use link in index.html
-import api from '../api/axiosConfig'; // or wherever you set up Axios with baseURL
+import '../styles/pageStyles/authForm.css';
+import 'boxicons/css/boxicons.min.css';
+import api from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
 
 const AuthForm = () => {
@@ -43,7 +43,7 @@ const AuthForm = () => {
       const res = await api.post('register/', registerData);
       alert("Registration successful!");
       console.log(res.data);
-      setIsRegistering(false); // go to login
+      setIsRegistering(false);
     } catch (err) {
       alert(err.response?.data?.error || "Registration failed");
     }

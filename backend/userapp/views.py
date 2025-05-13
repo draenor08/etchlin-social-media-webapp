@@ -37,7 +37,6 @@ def check_auth(request):
         return JsonResponse({'status': 'authenticated'})
     return JsonResponse({'status': 'unauthenticated'}, status=401)
 
-# REGISTER USER
 @csrf_exempt
 def register_user(request):
     if request.method == 'POST':
@@ -69,7 +68,6 @@ def register_user(request):
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
 
-# LOGIN USER
 @csrf_exempt
 def login_user(request):
     if request.method == 'POST':
@@ -100,7 +98,6 @@ def login_user(request):
                 conn.close()
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
-# LOGOUT
 @csrf_exempt
 def logout_user(request):
     request.session.flush()
@@ -113,14 +110,12 @@ def get_profile(request, user_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Fetch profile data
         cursor.execute("""
             SELECT user_id, first_name, last_name, email, bio, profile_picture, date_of_birth
             FROM user WHERE user_id = %s
         """, (user_id,))
         user = cursor.fetchone()
 
-        # Fetch user posts
         cursor.execute("""
             SELECT post_id, caption, image_url, timestamp
             FROM post WHERE user_id = %s
@@ -155,10 +150,8 @@ def upload_profile_picture(request):
         save_path = os.path.join('person', unique_filename)
 
         try:
-            # Save file
             full_path = default_storage.save(save_path, ContentFile(profile_pic.read()))
 
-            # Update DB
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("UPDATE user SET profile_picture = %s WHERE user_id = %s", (save_path, user_id))
@@ -214,17 +207,14 @@ def search_users(request):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Split the query to handle full name searches
         terms = query.split()
         if len(terms) == 1:
-            # Search by first or last name
             cursor.execute("""
                 SELECT user_id, first_name, last_name, profile_picture 
                 FROM user 
                 WHERE first_name LIKE %s OR last_name LIKE %s
             """, (f"%{terms[0]}%", f"%{terms[0]}%"))
         else:
-            # Search by full name
             cursor.execute("""
                 SELECT user_id, first_name, last_name, profile_picture 
                 FROM user 

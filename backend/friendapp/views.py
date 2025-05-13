@@ -22,7 +22,6 @@ def send_request(request):
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            # Insert friend request
             cursor.execute("""
                 INSERT INTO friends (request, acceptance, status) 
                 VALUES (%s, %s, 'pending')
@@ -46,7 +45,7 @@ def respond_request(request):
         user_id = request.session.get('user_id')
         data = json.loads(request.body)
         requester_id = data.get('requester_id')
-        action = data.get('action')  # 'accept' or 'reject'
+        action = data.get('action')
         if requester_id == user_id:
             return JsonResponse({'error': 'Cannot send friend request to yourself'}, status=400)
 
@@ -121,7 +120,6 @@ def remove_friend(request):
         data = json.loads(request.body)
         receiver_id = data.get('receiver_id')
 
-        # Validate the receiver ID
         if not receiver_id or receiver_id == user_id:
             return JsonResponse({'error': 'Invalid receiver ID'}, status=400)
 
@@ -129,7 +127,6 @@ def remove_friend(request):
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            # Remove the friendship (regardless of who sent the request)
             cursor.execute("""
                 DELETE FROM friends 
                 WHERE (request = %s AND acceptance = %s) 

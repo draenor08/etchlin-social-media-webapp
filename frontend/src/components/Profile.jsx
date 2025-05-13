@@ -70,7 +70,6 @@ const Profile = ({ profileData, isCurrentUser, refreshProfile, userPosts }) => {
         }
     };
 
-    // Function to handle profile picture upload
     const handleProfilePictureUpload = async () => {
         if (!selectedFile) return;
 
@@ -92,7 +91,6 @@ const Profile = ({ profileData, isCurrentUser, refreshProfile, userPosts }) => {
         }
     };
 
-    // Function to handle bio submission
     const handleBioSubmit = async () => {
         try {
             const response = await fetch('http://localhost:8000/api/profile/update/bio/', {

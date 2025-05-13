@@ -12,7 +12,6 @@ def create_comment(request):
             user_id = request.session.get('user_id')
             data = json.loads(request.body)
 
-            # Extracting post_id and content from the request
             post_id = data.get('post_id')
             comment_content = data.get('content')
 
@@ -22,7 +21,6 @@ def create_comment(request):
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            # Insert the comment into the database
             cursor.execute("""
                 INSERT INTO comment (post_id, user_id, content, is_blurred, timestamp)
                 VALUES (%s, %s, %s, %s, NOW())
@@ -30,7 +28,6 @@ def create_comment(request):
             conn.commit()
             comment_id = cursor.lastrowid
 
-            # Fetch the new comment details for the response
             cursor.execute("""
                 SELECT c.comment_id, c.content, c.timestamp, u.first_name, u.profile_picture
                 FROM comment c

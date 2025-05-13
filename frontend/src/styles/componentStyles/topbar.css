@@ -1,12 +1,10 @@
-/* Topbar.css */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap');
-/* Topbar.css */
 
 :root {
-  --topbar-bg: #1d3557;        /* Deep navy blue */
-  --topbar-text: #Ffff;      /* Soft beige */
-  --topbar-border: #1d3557;    /* Slightly lighter navy */
-  --search-bg: #FAF3E0;        /* Navy variant */
+  --topbar-bg: #1d3557;
+  --topbar-text: #Ffff;
+  --topbar-border: #1d3557;
+  --search-bg: #FAF3E0;
   --search-text: #36362e;
   --accent-gold: #8a8a79;
 }
