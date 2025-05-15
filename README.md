@@ -1,17 +1,17 @@
-```markdown
 # ✨ Etchlin - A Classy Social Media WebApp 👥📸
 
-Welcome to **Etchlin**, a tastefully minimalist social media platform that's like a calmer, more refined cousin of social media giants we are accustomed to. Built with love (and raw SQL), Etchlin is designed for simplicity, performance, and learning how full-stack magic works from scratch.
+Welcome to *Etchlin*, a tastefully minimalist social media platform that's like a calmer, more refined cousin of the chaotic social networks we know. Built with grit, raw SQL, and the occasional bout of late-night debugging, Etchlin aims to deliver a stripped-down, performance-driven social experience.
 
 ---
 
 ## 🎯 What is Etchlin?
 
-Etchlin is a **toned-down media platform** made for learning and fun. You can:
-- Create profiles and posts 🖼️
-- Add other users (two-way friendship) 🤝
-- Like, comment, and message 🔁
-- Flag posts/comments for admin review 🚩
+Etchlin is a **toned-down media platform** designed for those who appreciate simplicity and clean aesthetics. It's a project built to sharpen full-stack skills without the crutch of high-level abstractions. With Etchlin, you can:
+
+* Create profiles and posts 🖼️
+* Add friends (two-way model) 🤝
+* Like, comment, and message 🔁
+* Flag content for admin review 🚩
 
 All wrapped in a *navy blue & beige* aesthetic.
 
@@ -19,56 +19,61 @@ All wrapped in a *navy blue & beige* aesthetic.
 
 ## 🔧 Tech Stack
 
-| Layer         | Tech Used                       |
-|--------------|----------------------------------|
-| Frontend     | React.js                         |
-| Styling      | Custom CSS Styling               |
-| Backend      | Django (no ORM, raw SQL!)        |
-| Database     | MySQL                            |
-| Auth         | Session-based (cookies)🍪        |
-| Deployment   | (Planned) Vercel / Self-hosted   |
-| Version Ctrl | Git + GitHub                     |
+| Layer        | Tech Used                      |
+| ------------ | ------------------------------ |
+| Frontend     | React.js                       |
+| Styling      | Custom CSS                     |
+| Backend      | Django (no ORM, raw SQL!)      |
+| Database     | MySQL                          |
+| Auth         | Session-based (cookies)🍪      |
+| Deployment   | (Planned) Vercel / Self-hosted |
+| Version Ctrl | Git + GitHub                   |
 
 ---
 
-## 💡 Key Features
+### 💡 Key Features
 
-### 👤 User System
-- Register / Login / Logout
-- Edit profile (bio, profile picture)
-- Session-based auth with redirect after login
+👤 **User System**
 
-### 📸 Posts
-- Create, edit and delete post (image/text)
-- View all posts (feed)
-- Like & comment
-- See your own posts on profile
+* Register / Login / Logout
+* Edit profile (bio, profile picture)
+* Session-based auth with redirect after login
 
-### 💬 Messaging
-- Simple non-real-time messaging (sender → receiver)
-- View messages in order
+📸 **Posts**
 
-### 🧭 Social
-- Add Friends (like facebook)
-- View friend list
-- Search users & posts
+* Create, edit and delete post (image/text)
+* View all posts (feed)
+* Like & comment
+* See your own posts on profile
 
-### ⚠️ Admin Audit
-- Admins are regular users with extra powers
-- Flag & view flagged content (posts/comments)
-- No special dashboard (just actions)
+💬 **Messaging**
 
-### 🖼️ Media Handling
-- Image uploads are stored **locally**
-- Image URLs saved in database
+* Simple non-real-time messaging (sender → receiver)
+* View messages in order
+
+🧭 **Social**
+
+* Add Friends (one-way follow model)
+* View friend list
+* Search users & posts
+
+⚠️ **Admin Audit**
+
+* Admins are regular users with extra powers
+* Flag & view flagged content (posts/comments)
+* No special dashboard (just actions)
+
+🖼️ **Media Handling**
+
+* Image uploads are stored **locally**
+* Image URLs saved in database
 
 ---
 
 ## 🚧 Folder Structure (Backend)
 
 ```
-
-etchlin-backend/
+backend/
 ├── userapp/
 ├── postapp/
 ├── socialapp/
@@ -77,24 +82,24 @@ etchlin-backend/
 ├── auth/
 ├── db/
 └── main.py (or views.py/router.py depending on split)
-
-````
+```
 
 ---
 
 ## 🧪 How to Run (Locally)
 
+### Backend Setup
 
-
-### Backend
+```bash
 cd etchlin-backend
 python -m venv venv
 venv\Scripts\activate
-pip install -r requirement.txt
+pip install -r requirements.txt
+python manage.py migrate
 python manage.py runserver
-````
+```
 
-### Frontend
+### Frontend Setup
 
 ```bash
 cd etchlin-frontend
@@ -102,7 +107,7 @@ npm install
 npm start
 ```
 
-Make sure you ran the database script, MySQL is running, and `.env` is properly configured!
+> **Note:** Make sure you ran the database script, MySQL is running, and your `.env` is properly configured!
 
 ---
 
@@ -116,7 +121,7 @@ Make sure you ran the database script, MySQL is running, and `.env` is properly 
 
 ## 🌐 Live Demo (Coming Soon...)
 
-📦 Will be deployed via **Vercel** and possibly a self-hosted backend.
+> [Watch the Demo](https://youtu.be/QZa5NhSctiY) 👀
 
 ---
 
