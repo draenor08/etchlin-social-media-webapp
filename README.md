@@ -1,31 +1,31 @@
 ```markdown
 # ✨ Etchlin - A Classy Social Media WebApp 👥📸
 
-Welcome to **Etchlin**, a tastefully minimalist social media platform that's like a calmer, more refined cousin of Instagram. Built with love (and raw SQL), Etchlin is designed for simplicity, performance, and learning how full-stack magic works from scratch.
+Welcome to **Etchlin**, a tastefully minimalist social media platform that's like a calmer, more refined cousin of social media giants we are accustomed to. Built with love (and raw SQL), Etchlin is designed for simplicity, performance, and learning how full-stack magic works from scratch.
 
 ---
 
 ## 🎯 What is Etchlin?
 
-Etchlin is a **toned-down Instagram clone** made for learning and fun. You can:
+Etchlin is a **toned-down media platform** made for learning and fun. You can:
 - Create profiles and posts 🖼️
-- Follow other users (one-way "friendship") 🤝
+- Add other users (two-way friendship) 🤝
 - Like, comment, and message 🔁
 - Flag posts/comments for admin review 🚩
 
-All wrapped in a *navy blue & beige "old money"* aesthetic.
+All wrapped in a *navy blue & beige* aesthetic.
 
 ---
 
 ## 🔧 Tech Stack
 
-| Layer         | Tech Used                        |
+| Layer         | Tech Used                       |
 |--------------|----------------------------------|
 | Frontend     | React.js                         |
-| Styling      | Custom CSS + Template Styling    |
+| Styling      | Custom CSS Styling               |
 | Backend      | Django (no ORM, raw SQL!)        |
 | Database     | MySQL                            |
-| Auth         | Session-based (cookies) 🍪       |
+| Auth         | Session-based (cookies)🍪        |
 | Deployment   | (Planned) Vercel / Self-hosted   |
 | Version Ctrl | Git + GitHub                     |
 
@@ -35,11 +35,11 @@ All wrapped in a *navy blue & beige "old money"* aesthetic.
 
 ### 👤 User System
 - Register / Login / Logout
-- Edit profile (bio, image)
+- Edit profile (bio, profile picture)
 - Session-based auth with redirect after login
 
 ### 📸 Posts
-- Create post (image/text)
+- Create, edit and delete post (image/text)
 - View all posts (feed)
 - Like & comment
 - See your own posts on profile
@@ -49,7 +49,7 @@ All wrapped in a *navy blue & beige "old money"* aesthetic.
 - View messages in order
 
 ### 🧭 Social
-- One-way follows (like Instagram)
+- Add Friends (like facebook)
 - View friend list
 - Search users & posts
 
@@ -84,9 +84,13 @@ etchlin-backend/
 
 ## 🧪 How to Run (Locally)
 
+
+
 ### Backend
-```bash
 cd etchlin-backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirement.txt
 python manage.py runserver
 ````
 
@@ -98,7 +102,7 @@ npm install
 npm start
 ```
 
-Make sure MySQL is running and `.env` is properly configured!
+Make sure you ran the database script, MySQL is running, and `.env` is properly configured!
 
 ---
 
@@ -148,7 +152,3 @@ Made with grit, SQL, and late-night debugging by [@draenor08](https://github.com
 
 > Etch your moments. Quietly, beautifully.
 > — *Etchlin*
-
-```
-I am yet to create a requirement.txt file for the backend dependencies. I will hopefully create one once I am done with this project.
-```
